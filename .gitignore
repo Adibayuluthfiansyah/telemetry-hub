@@ -1,0 +1,20 @@
+target/
+# Remove Cargo.lock if this project becomes a library-only workspace.
+# For this application workspace, we KEEP Cargo.lock.
+# Cargo.lock
+.env
+.env.local
+.env.*.local
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+tmp/
+temp/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+dist/
+build/
