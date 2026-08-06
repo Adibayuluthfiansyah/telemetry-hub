@@ -20,5 +20,8 @@ sqlx = { version = "0.9.0", features = [
 ] }
 
 uuid = { version = "1", features = ["v4", "serde"] }
-
+async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
+
+telemetry_core = { path = "../../crates/core" }
+anyhow = "1.0.104"
