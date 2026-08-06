@@ -24,65 +24,9 @@ Instead of depending on physical hardware, the project starts with a Virtual Dev
 
 ---
 
-## Tech Stack
-
-### Backend
-
-* Rust
-* Tokio
-* Axum
-* Serde
-
-### Frontend
-
-* Next.js
-* React
-* Tailwind CSS
-* Recharts
-
----
-
-## Project Structure
-
-```text
-telemetry-hub/
-│
-├── apps/
-│   ├── server/
-│   └── simulator/
-│
-├── crates/
-│
-├── frontend/
-│
-├── docs/
-│   └── software-architecture.md
-│
-├── docker/
-│
-├── Cargo.toml
-└── README.md
-```
-
----
-
-## Development Roadmap
-
-* [ ] Project Setup
-* [ ] Cargo Workspace
-* [ ] Core Domain
-* [ ] Backend API
-* [ ] Virtual Device Simulator
-* [ ] WebSocket
-* [ ] Dashboard
-* [ ] Database Support
-* [ ] Physical Device Integration
-
----
-
 ## Project Status
 
-🚧 Under Development
+Under Development
 
 ---
 
