@@ -9,8 +9,11 @@ mod services;
 mod state;
 
 use crate::config::Config;
+use crate::repositories::postgres::device_repository::PostgresDeviceRepository;
+use crate::services::device_service::DeviceService;
 use crate::state::AppState;
 use std::net::SocketAddr;
+use std::sync::Arc;
 use tokio::net::TcpListener;
 #[tokio::main]
 
@@ -23,9 +26,15 @@ async fn main() {
     database::run(&pool)
         .await
         .expect("Failed to run database migrations");
-    let state = AppState { config, db: pool };
+    let device_repository = PostgresDeviceRepository::new(pool.clone());
+    let device_service = DeviceService::new(device_repository);
+    let address: SocketAddr = format!("{}:{}", config.app_host, config.app_port)
+        .parse()
+        .expect("Invalid bind address in configuration");
+    let state = AppState {
+        device_service: Arc::new(device_service),
+    };
     let app = app::create_app(state);
-    let address = SocketAddr::from(([127, 0, 0, 1], 3000));
 
     println!("Server Running At http://{}", address);
     let listener = TcpListener::bind(address)
