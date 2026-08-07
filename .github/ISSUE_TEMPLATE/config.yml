@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/Adibayuluthfiansyah/telemetry-hub/discussions
+    about: Ask "how do I…" questions and discuss design here (if Discussions is enabled on the repository).
+  - name: Security report
+    url: https://github.com/Adibayuluthfiansyah/telemetry-hub/security/advisories/new
+    about: Report a vulnerability privately. Do NOT open a public issue for security problems.

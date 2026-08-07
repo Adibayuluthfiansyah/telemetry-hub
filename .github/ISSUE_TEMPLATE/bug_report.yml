@@ -1,0 +1,74 @@
+name: Bug report
+description: Report a defect in Telemetry Hub
+title: "[bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        **Security issue?** Do not use this template. Report privately per
+        SECURITY.md — email adibayuluthfiansyah@gmail.com with a `[SECURITY]`
+        subject, or use the GitHub Security tab.
+
+        Before opening, check the README and CONTRIBUTING for setup steps and
+        confirm the issue reproduces on the latest `main`.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Exact commands, from a fresh checkout if possible. Include the full error output.
+      placeholder: |
+        1. `docker compose -f docker/docker-compose.yml up -d`
+        2. `cargo run -p server`
+        3. `curl http://127.0.0.1:3000/health`
+        ...
+    validations:
+      required: true
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Affected layer
+      description: Which seam does the defect sit in?
+      options:
+        - Domain (crates/core)
+        - Handler / DTO (HTTP layer)
+        - Service layer
+        - Repository trait
+        - Repository implementation (Postgres)
+        - Database / migration
+        - Simulator
+        - Docker / configuration
+        - Build / tooling
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: rust-version
+    attributes:
+      label: Rust version
+      description: Output of `rustc --version`
+      placeholder: "rustc 1.8x.x"
+    validations:
+      required: false
+  - type: input
+    id: db-version
+    attributes:
+      label: Database version
+      description: Output of `docker ps` for the telemetry-postgres container
+      placeholder: "postgres:17-alpine"
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Logs, screenshots, or anything else that helps reproduce.

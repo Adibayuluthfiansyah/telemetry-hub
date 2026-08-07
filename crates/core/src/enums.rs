@@ -1,13 +1,15 @@
+use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
-use std::fmt::{self, write};
+use std::fmt::{self};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum DeviceType {
     Simulator,
     Esp32,
     Arduino,
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum DeviceStatus {
     Online,
     Offline,

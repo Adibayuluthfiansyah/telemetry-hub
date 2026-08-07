@@ -1,0 +1,61 @@
+name: Feature request
+description: Propose a new capability for Telemetry Hub
+title: "[feature]: "
+labels: ["feature", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a feature.
+
+        Telemetry Hub extends through **contracts, not flags** — a feature that
+        needs a mode/flag to coexist with the architecture is usually a sign the
+        seam is misdrawn. Read `docs/PRODUCT_VISION.md` before writing this
+        request; the answer to "which seam does it touch" decides whether it is
+        actionable.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What real problem does this solve? Who hits it today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the capability as concretely as you can.
+    validations:
+      required: true
+  - type: dropdown
+    id: seam
+    attributes:
+      label: Which seam does it touch?
+      description: The extensibility axes from the product vision.
+      options:
+        - Devices (new DeviceType / device contract)
+        - Transport (new protocol adapter — REST/WebSocket/MQTT)
+        - Persistence (new repository implementation behind existing traits)
+        - "Processing (telemetry pipeline: validation, enrichment, alerting)"
+        - API surface (handlers/DTOs)
+        - Dashboard / frontend
+        - Tooling (scripts, CI, docs)
+        - Not sure — discuss first
+    validations:
+      required: true
+  - type: dropdown
+    id: alternative
+    attributes:
+      label: Is this already a non-goal?
+      description: The vision explicitly rejects some scope. Check before proposing.
+      options:
+        - "No — it is within current scope"
+        - "Yes — auth, MQTT, physical devices, cloud/k8s, multi-tenancy, analytics"
+        - "Not sure"
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Architecture impact
+      description: What existing boundaries does this touch or extend? New seam or existing?

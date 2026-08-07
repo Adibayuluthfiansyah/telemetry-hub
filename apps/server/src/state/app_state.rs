@@ -1,9 +1,8 @@
-use sqlx::PgPool;
+use crate::repositories::PostgresDeviceRepository;
+use crate::services::device_service::DeviceService;
+use std::sync::Arc;
 
-use crate::config::Config;
-
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct AppState {
-    pub config: Config,
-    pub db: PgPool,
+    pub device_service: Arc<DeviceService<PostgresDeviceRepository>>,
 }
