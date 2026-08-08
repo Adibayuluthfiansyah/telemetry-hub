@@ -25,3 +25,8 @@ chrono = { version = "0.4", features = ["serde"] }
 
 telemetry_core = { path = "../../crates/core" }
 anyhow = "1.0.104"
+
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+tower-http = { workspace = true }
+tower = { workspace = true }

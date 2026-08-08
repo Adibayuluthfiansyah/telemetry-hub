@@ -2,7 +2,6 @@ use crate::repositories::DeviceRepository;
 use crate::repositories::postgres::models::DeviceRecord;
 use async_trait::async_trait;
 use sqlx::PgPool;
-use sqlx::query_as;
 use telemetry_core::Device;
 
 pub struct PostgresDeviceRepository {
@@ -27,7 +26,7 @@ impl DeviceRepository for PostgresDeviceRepository {
                 device_type,
                 status,
                 created_at,
-                updated_at,
+                updated_at
             )
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             "#,
