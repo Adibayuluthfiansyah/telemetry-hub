@@ -1,23 +1,21 @@
-mod app;
-mod config;
-mod database;
-mod dto;
-mod handlers;
-mod repositories;
-mod router;
-mod services;
-mod state;
-
-use crate::config::Config;
-use crate::repositories::postgres::device_repository::PostgresDeviceRepository;
-use crate::services::device_service::DeviceService;
-use crate::state::AppState;
+use server::{
+    config::Config, database, repositories::postgres::PostgresDeviceRepository, router,
+    services::device_service::DeviceService, state::AppState,
+};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
+use tower_http::trace::TraceLayer;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 #[tokio::main]
 
 async fn main() {
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::EnvFilter::new(
+            "server=debug,tower_http=debug",
+        ))
+        .with(tracing_subscriber::fmt::layer())
+        .init();
     let config = Config::load().expect("Failed to load config");
     println!("{:#?}", config);
     let pool = database::connect(&config)
@@ -34,7 +32,9 @@ async fn main() {
     let state = AppState {
         device_service: Arc::new(device_service),
     };
-    let app = app::create_app(state);
+    let app = router::create_router()
+        .with_state(state)
+        .layer(TraceLayer::new_for_http());
 
     println!("Server Running At http://{}", address);
     let listener = TcpListener::bind(address)

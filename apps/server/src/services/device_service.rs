@@ -34,4 +34,10 @@ where
         self.repository.save(&device).await?;
         Ok(device)
     }
+    pub async fn get_by_code(&self, code: &str) -> anyhow::Result<Device> {
+        self.repository
+            .find_by_code(code)
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("Device with code {} not found", code))
+    }
 }
