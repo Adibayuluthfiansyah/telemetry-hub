@@ -1,6 +1,10 @@
 use server::{
-    config::Config, database, repositories::postgres::PostgresDeviceRepository, router,
-    services::device_service::DeviceService, state::AppState,
+    config::Config,
+    database,
+    repositories::postgres::{PostgresDeviceRepository, PostgresTelemetryRepository},
+    router,
+    services::{DeviceService, TelemetryService},
+    state::AppState,
 };
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -26,11 +30,17 @@ async fn main() {
         .expect("Failed to run database migrations");
     let device_repository = PostgresDeviceRepository::new(pool.clone());
     let device_service = DeviceService::new(device_repository);
+    let telemetry_repository = PostgresTelemetryRepository::new(pool.clone());
+    let telemetry_service = TelemetryService::new(
+        PostgresDeviceRepository::new(pool.clone()),
+        telemetry_repository,
+    );
     let address: SocketAddr = format!("{}:{}", config.app_host, config.app_port)
         .parse()
         .expect("Invalid bind address in configuration");
     let state = AppState {
         device_service: Arc::new(device_service),
+        telemetry_service: Arc::new(telemetry_service),
     };
     let app = router::create_router()
         .with_state(state)
