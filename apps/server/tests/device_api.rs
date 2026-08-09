@@ -7,7 +7,9 @@ use axum::{
 use common::test_pool;
 use serde_json::json;
 use server::{
-    app::create_app, repositories::PostgresDeviceRepository, services::DeviceService,
+    app::create_app,
+    repositories::postgres::{PostgresDeviceRepository, PostgresTelemetryRepository},
+    services::{DeviceService, TelemetryService},
     state::AppState,
 };
 use std::sync::Arc;
@@ -16,22 +18,33 @@ use tower::ServiceExt;
 #[tokio::test]
 async fn create_device_should_return_409_when_code_exist() {
     let pool = test_pool().await;
+
     sqlx::query("DELETE FROM devices WHERE code = 'API-TEST-002'")
         .execute(&pool)
         .await
         .expect("failed to clean test device");
-    let repository = PostgresDeviceRepository::new(pool);
-    let service = DeviceService::new(repository);
+
+    let device_repository = PostgresDeviceRepository::new(pool.clone());
+    let device_service = DeviceService::new(device_repository);
+
+    let telemetry_service = TelemetryService::new(
+        PostgresDeviceRepository::new(pool.clone()),
+        PostgresTelemetryRepository::new(pool),
+    );
+
     let state = AppState {
-        device_service: Arc::new(service),
+        device_service: Arc::new(device_service),
+        telemetry_service: Arc::new(telemetry_service),
     };
 
     let app = create_app(state);
+
     let payload = json!({
-         "code": "API-TEST-002",
+        "code": "API-TEST-002",
         "name": "API Test Device",
         "device_type": "SIMULATOR"
     });
+
     let request = || {
         Request::builder()
             .method("POST")
@@ -40,10 +53,13 @@ async fn create_device_should_return_409_when_code_exist() {
             .body(Body::from(payload.to_string()))
             .unwrap()
     };
+
     let first_response = app.clone().oneshot(request()).await.unwrap();
+
     assert_eq!(first_response.status(), StatusCode::CREATED);
 
     let second_response = app.clone().oneshot(request()).await.unwrap();
+
     assert_eq!(second_response.status(), StatusCode::CONFLICT);
 }
 
@@ -56,12 +72,17 @@ async fn get_device_should_return_200_when_device_exists() {
         .await
         .expect("failed to clean test device");
 
-    let repository = PostgresDeviceRepository::new(pool);
+    let device_repository = PostgresDeviceRepository::new(pool.clone());
+    let device_service = DeviceService::new(device_repository);
 
-    let service = DeviceService::new(repository);
+    let telemetry_service = TelemetryService::new(
+        PostgresDeviceRepository::new(pool.clone()),
+        PostgresTelemetryRepository::new(pool),
+    );
 
     let state = AppState {
-        device_service: Arc::new(service),
+        device_service: Arc::new(device_service),
+        telemetry_service: Arc::new(telemetry_service),
     };
 
     let app = create_app(state);
@@ -110,11 +131,17 @@ async fn get_device_should_return_404_when_device_does_not_exist() {
         .await
         .expect("failed to clean test device");
 
-    let repository = PostgresDeviceRepository::new(pool);
-    let service = DeviceService::new(repository);
+    let device_repository = PostgresDeviceRepository::new(pool.clone());
+    let device_service = DeviceService::new(device_repository);
+
+    let telemetry_service = TelemetryService::new(
+        PostgresDeviceRepository::new(pool.clone()),
+        PostgresTelemetryRepository::new(pool),
+    );
 
     let state = AppState {
-        device_service: Arc::new(service),
+        device_service: Arc::new(device_service),
+        telemetry_service: Arc::new(telemetry_service),
     };
 
     let app = create_app(state);

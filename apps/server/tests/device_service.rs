@@ -1,3 +1,4 @@
+#[allow(dead_code, unused_imports)]
 mod mocks;
 use mocks::MockDeviceRepository;
 use server::services::device_service::DeviceService;

@@ -37,3 +37,9 @@ impl IntoResponse for AppError {
             .into_response()
     }
 }
+
+impl From<axum::extract::rejection::JsonRejection> for AppError {
+    fn from(rejection: axum::extract::rejection::JsonRejection) -> Self {
+        AppError::BadRequest(format!("Invalid JSON payload: {}", rejection.body_text()))
+    }
+}

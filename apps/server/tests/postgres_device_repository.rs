@@ -8,6 +8,16 @@ use uuid::Uuid;
 #[tokio::test]
 async fn save_should_persist_device() {
     let pool = test_pool().await;
+    sqlx::query(
+        r#"
+        DELETE FROM telemetry
+        WHERE device_id IN (SELECT id FROM devices WHERE code = $1)
+        "#,
+    )
+    .bind("TEST-001")
+    .execute(&pool)
+    .await
+    .expect("Failed to clean test telemetry");
     sqlx::query("DELETE FROM devices WHERE code = 'TEST-001'")
         .execute(&pool)
         .await
