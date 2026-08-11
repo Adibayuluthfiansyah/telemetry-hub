@@ -29,13 +29,14 @@ describes only what exists.
 
 Goal: a telemetry sample can travel device → API → database → query.
 
-- ⏳ `telemetry` table migration (+ `(device_id, created_at)` index)
-- ⏳ `TelemetryRecord` model and `PostgresTelemetryRepository` implementing
+- ✅ `telemetry` table migration (+ `(device_id, recorded_at)` index)
+- ✅ `TelemetryRecord` model and `PostgresTelemetryRepository` implementing
   `TelemetryRepository`
-- ⏳ `DeviceService::create_device` and the telemetry service layer
-- ⏳ Routes: `POST /devices`, `POST /telemetry` using the existing DTOs
+- ✅ `DeviceService::create_device` and the telemetry service layer
+- ✅ Routes: `POST /devices`, `POST /telemetry` using the existing DTOs
 - ⏳ DB-aware `/health` (readiness, not just liveness)
-- ⏳ Error-response contract and request validation
+- ✅ Error-response contract and request validation
+- ✅ Telemetry query endpoint: `GET /telemetry` (data can be read back)
 
 **Exit criteria:** end-to-end flow works from curl against a fresh database.
 
@@ -43,7 +44,7 @@ Goal: a telemetry sample can travel device → API → database → query.
 
 Goal: the platform's first device is real, and the platform is observable.
 
-- ⏳ Real simulator: interval-driven (`SIMULATOR_INTERVAL_MS`), speaking the
+- ✅ Real simulator: interval-driven (`SIMULATOR_INTERVAL_MS`), speaking the
   same contract as future hardware (vision principle: the simulator is
   first-class, never a demo path)
 - ⏳ Seed script and development tooling in `scripts/`

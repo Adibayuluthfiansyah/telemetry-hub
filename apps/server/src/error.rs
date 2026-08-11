@@ -43,3 +43,12 @@ impl From<axum::extract::rejection::JsonRejection> for AppError {
         AppError::BadRequest(format!("Invalid JSON payload: {}", rejection.body_text()))
     }
 }
+
+impl From<axum::extract::rejection::QueryRejection> for AppError {
+    fn from(rejection: axum::extract::rejection::QueryRejection) -> Self {
+        AppError::BadRequest(format!(
+            "Invalid query parameters: {}",
+            rejection.body_text()
+        ))
+    }
+}

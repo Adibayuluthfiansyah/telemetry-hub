@@ -1,5 +1,6 @@
 mod common;
-use chrono::Utc;
+
+use chrono::{SubsecRound, Utc};
 use common::test_pool;
 use server::repositories::{PostgresTelemetryRepository, TelemetryRepository};
 use sqlx::FromRow;
@@ -17,15 +18,16 @@ struct TelemetryTestRow {
 async fn save_should_persist_all_metrics() {
     let pool = test_pool().await;
     let device_id = Uuid::new_v4();
+
     sqlx::query(
         r#"
-    DELETE FROM telemetry
-    WHERE device_id IN (
-        SELECT id
-        FROM devices
-        WHERE code = $1
-    )
-    "#,
+        DELETE FROM telemetry
+        WHERE device_id IN (
+            SELECT id
+            FROM devices
+            WHERE code = $1
+        )
+        "#,
     )
     .bind("TEST-001")
     .execute(&pool)
@@ -34,9 +36,9 @@ async fn save_should_persist_all_metrics() {
 
     sqlx::query(
         r#"
-    DELETE FROM devices
-    WHERE code = $1
-    "#,
+        DELETE FROM devices
+        WHERE code = $1
+        "#,
     )
     .bind("TEST-001")
     .execute(&pool)
@@ -45,14 +47,14 @@ async fn save_should_persist_all_metrics() {
 
     sqlx::query(
         r#"
-    INSERT INTO devices (
-        id,
-        code,
-        name,
-        status
-    )
-    VALUES ($1, $2, $3, $4)
-    "#,
+        INSERT INTO devices (
+            id,
+            code,
+            name,
+            status
+        )
+        VALUES ($1, $2, $3, $4)
+        "#,
     )
     .bind(device_id)
     .bind("TEST-001")
@@ -63,6 +65,7 @@ async fn save_should_persist_all_metrics() {
     .expect("Failed to create test device");
 
     let recorded_at = Utc::now();
+
     let telemetry = Telemetry {
         id: Uuid::new_v4(),
         device_id,
@@ -80,6 +83,7 @@ async fn save_should_persist_all_metrics() {
         ],
         recorded_at,
     };
+
     let repository = PostgresTelemetryRepository::new(pool.clone());
 
     repository
@@ -115,6 +119,7 @@ async fn save_should_persist_all_metrics() {
 async fn save_should_rollback_when_insert_fails() {
     let pool = test_pool().await;
     let device_id = Uuid::new_v4();
+
     sqlx::query(
         r#"
         DELETE FROM telemetry
@@ -159,7 +164,9 @@ async fn save_should_rollback_when_insert_fails() {
     .execute(&pool)
     .await
     .expect("Failed to create test device");
+
     let recorded_at = Utc::now();
+
     let telemetry = Telemetry {
         id: Uuid::new_v4(),
         device_id,
@@ -177,8 +184,11 @@ async fn save_should_rollback_when_insert_fails() {
         ],
         recorded_at,
     };
+
     let repository = PostgresTelemetryRepository::new(pool.clone());
+
     let result = repository.save(&telemetry).await;
+
     assert!(result.is_err());
 
     let count: i64 = sqlx::query_scalar(
@@ -194,4 +204,262 @@ async fn save_should_rollback_when_insert_fails() {
     .expect("Failed to count telemetry rows");
 
     assert_eq!(count, 0);
+}
+
+#[tokio::test]
+async fn find_by_device_should_return_rows() {
+    let pool = test_pool().await;
+    let device_id = Uuid::new_v4();
+    let device_code = "TEST-QUERY-001";
+
+    // Cleanup first so the test can be rerun safely.
+    sqlx::query(
+        r#"
+        DELETE FROM telemetry
+        WHERE device_id IN (
+            SELECT id
+            FROM devices
+            WHERE code = $1
+        )
+        "#,
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean test telemetry");
+
+    sqlx::query(
+        r#"
+        DELETE FROM devices
+        WHERE code = $1
+        "#,
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean test device");
+
+    sqlx::query(
+        r#"
+        INSERT INTO devices (
+            id,
+            code,
+            name,
+            status
+        )
+        VALUES ($1, $2, $3, $4)
+        "#,
+    )
+    .bind(device_id)
+    .bind(device_code)
+    .bind("Query Test Device")
+    .bind("ONLINE")
+    .execute(&pool)
+    .await
+    .expect("Failed to create test device");
+
+    let recorded_at = Utc::now().trunc_subsecs(3);
+
+    let telemetry = Telemetry {
+        id: Uuid::new_v4(),
+        device_id,
+        metrics: vec![
+            Metric {
+                key: "temperature".to_string(),
+                value: 25.5,
+                unit: "celsius".to_string(),
+            },
+            Metric {
+                key: "humidity".to_string(),
+                value: 60.0,
+                unit: "percent".to_string(),
+            },
+        ],
+        recorded_at,
+    };
+
+    let repository = PostgresTelemetryRepository::new(pool.clone());
+
+    repository
+        .save(&telemetry)
+        .await
+        .expect("Failed to save telemetry");
+
+    let samples = repository
+        .find_by_device(device_id, 100)
+        .await
+        .expect("Failed to find telemetry");
+    assert_eq!(samples.len(), 2);
+
+    let temperature = samples
+        .iter()
+        .find(|sample| sample.key == "temperature")
+        .expect("temperature sample not found");
+
+    assert_eq!(temperature.value, 25.5);
+    assert_eq!(temperature.unit, "celsius");
+    assert_eq!(temperature.recorded_at, recorded_at);
+
+    let humidity = samples
+        .iter()
+        .find(|sample| sample.key == "humidity")
+        .expect("humidity sample not found");
+
+    assert_eq!(humidity.value, 60.0);
+    assert_eq!(humidity.unit, "percent");
+    assert_eq!(humidity.recorded_at, recorded_at);
+}
+
+#[tokio::test]
+async fn find_by_device_should_return_empty_vec() {
+    let pool = test_pool().await;
+    let device_id = Uuid::new_v4();
+    let device_code = "TEST-QUERY-EMPTY";
+
+    // Cleanup first so the test can be rerun safely.
+    sqlx::query(
+        r#"
+        DELETE FROM telemetry
+        WHERE device_id IN (
+            SELECT id
+            FROM devices
+            WHERE code = $1
+        )
+        "#,
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean test telemetry");
+
+    sqlx::query(
+        r#"
+        DELETE FROM devices
+        WHERE code = $1
+        "#,
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean test device");
+
+    sqlx::query(
+        r#"
+        INSERT INTO devices (
+            id,
+            code,
+            name,
+            status
+        )
+        VALUES ($1, $2, $3, $4)
+        "#,
+    )
+    .bind(device_id)
+    .bind(device_code)
+    .bind("Empty Query Device")
+    .bind("ONLINE")
+    .execute(&pool)
+    .await
+    .expect("Failed to create test device");
+
+    let repository = PostgresTelemetryRepository::new(pool);
+
+    let samples = repository
+        .find_by_device(device_id, 100)
+        .await
+        .expect("Failed to find telemetry");
+
+    assert!(samples.is_empty());
+}
+
+#[tokio::test]
+async fn find_by_device_should_respect_limit() {
+    let pool = test_pool().await;
+    let device_id = Uuid::new_v4();
+    let device_code = "TEST-QUERY-LIMIT";
+
+    // Cleanup first so the test can be rerun safely.
+    sqlx::query(
+        r#"
+        DELETE FROM telemetry
+        WHERE device_id IN (
+            SELECT id
+            FROM devices
+            WHERE code = $1
+        )
+        "#,
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean test telemetry");
+
+    sqlx::query(
+        r#"
+        DELETE FROM devices
+        WHERE code = $1
+        "#,
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean test device");
+
+    sqlx::query(
+        r#"
+        INSERT INTO devices (
+            id,
+            code,
+            name,
+            status
+        )
+        VALUES ($1, $2, $3, $4)
+        "#,
+    )
+    .bind(device_id)
+    .bind(device_code)
+    .bind("Limit Query Device")
+    .bind("ONLINE")
+    .execute(&pool)
+    .await
+    .expect("Failed to create test device");
+
+    let recorded_at = Utc::now().trunc_subsecs(3);
+
+    let telemetry = Telemetry {
+        id: Uuid::new_v4(),
+        device_id,
+        metrics: vec![
+            Metric {
+                key: "temperature".to_string(),
+                value: 25.5,
+                unit: "celsius".to_string(),
+            },
+            Metric {
+                key: "humidity".to_string(),
+                value: 60.0,
+                unit: "percent".to_string(),
+            },
+            Metric {
+                key: "battery".to_string(),
+                value: 95.0,
+                unit: "percent".to_string(),
+            },
+        ],
+        recorded_at,
+    };
+
+    let repository = PostgresTelemetryRepository::new(pool);
+
+    repository
+        .save(&telemetry)
+        .await
+        .expect("Failed to save telemetry");
+
+    let samples = repository
+        .find_by_device(device_id, 2)
+        .await
+        .expect("Failed to find telemetry");
+
+    assert_eq!(samples.len(), 2)
 }

@@ -3,7 +3,7 @@ use crate::{
     repositories::{DeviceRepository, TelemetryRepository},
 };
 use chrono::Utc;
-use telemetry_core::{Telemetry, metric::Metric};
+use telemetry_core::{Sample, Telemetry, metric::Metric};
 use uuid::Uuid;
 
 pub struct TelemetryService<D, T>
@@ -57,5 +57,15 @@ where
         self.telemetry_repository.save(&telemetry).await?;
 
         Ok(telemetry)
+    }
+    pub async fn get_telemetry(&self, device_id: Uuid, limit: i64) -> anyhow::Result<Vec<Sample>> {
+        let limit = limit.clamp(1, 1000);
+        self.device_repository
+            .find_by_id(device_id)
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("Device with id {} not found", device_id))?;
+        self.telemetry_repository
+            .find_by_device(device_id, limit)
+            .await
     }
 }
