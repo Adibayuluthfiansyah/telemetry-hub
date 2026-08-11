@@ -11,6 +11,9 @@ pub fn create_router() -> Router<AppState> {
         .route("/health", get(health::health))
         .route("/devices", post(device::create_device))
         .route("/devices/{code}", get(device::get_device))
-        .route("/telemetry", post(telemetry::create_telemetry));
+        .route(
+            "/telemetry",
+            get(telemetry::get_telemetry).post(telemetry::create_telemetry),
+        );
     Router::new().nest("/api/v1", api_v1)
 }

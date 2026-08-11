@@ -3,6 +3,7 @@ use crate::repositories::postgres::models::DeviceRecord;
 use async_trait::async_trait;
 use sqlx::PgPool;
 use telemetry_core::Device;
+use uuid::Uuid;
 
 pub struct PostgresDeviceRepository {
     pool: PgPool,
@@ -49,6 +50,14 @@ impl DeviceRepository for PostgresDeviceRepository {
             SELECT id, code, name, device_type, status, created_at, updated_at FROM devices WHERE code = $1
             "#,
         ).bind(code).fetch_optional(&self.pool).await?;
+        Ok(record.map(Into::into))
+    }
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Device>> {
+        let record = sqlx::query_as::<_, DeviceRecord>(
+            r#"
+            SELECT id, code, name, device_type, status, created_at, updated_at FROM devices WHERE id = $1
+            "#,
+        ).bind(id).fetch_optional(&self.pool).await?;
         Ok(record.map(Into::into))
     }
 }

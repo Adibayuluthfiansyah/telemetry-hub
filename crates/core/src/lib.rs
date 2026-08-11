@@ -3,13 +3,14 @@ pub mod device;
 pub mod enums;
 pub mod event;
 pub mod metric;
+pub mod sample;
 pub mod telemetry;
 pub use alert::Alert;
 pub use device::Device;
-pub use event::Event;
-pub use telemetry::Telemetry;
-
 pub use enums::{AlertSeverity, DeviceStatus, DeviceType, EventType};
+pub use event::Event;
+pub use sample::Sample;
+pub use telemetry::Telemetry;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right

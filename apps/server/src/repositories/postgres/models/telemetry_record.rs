@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
-use telemetry_core::metric::Metric;
+use telemetry_core::{Sample, metric::Metric};
 use uuid::Uuid;
 
 #[derive(Debug, FromRow)]
@@ -19,6 +19,17 @@ impl From<TelemetryRecord> for Metric {
             key: record.key,
             value: record.value,
             unit: record.unit,
+        }
+    }
+}
+
+impl From<TelemetryRecord> for Sample {
+    fn from(record: TelemetryRecord) -> Self {
+        Self {
+            key: record.key,
+            value: record.value,
+            unit: record.unit,
+            recorded_at: record.recorded_at,
         }
     }
 }

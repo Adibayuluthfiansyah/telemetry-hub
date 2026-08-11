@@ -29,4 +29,13 @@ impl DeviceRepository for MockDeviceRepository {
     async fn find_by_code(&self, code: &str) -> anyhow::Result<Option<Device>> {
         Ok(self.devices.lock().unwrap().get(code).cloned())
     }
+    async fn find_by_id(&self, id: uuid::Uuid) -> anyhow::Result<Option<Device>> {
+        Ok(self
+            .devices
+            .lock()
+            .unwrap()
+            .values()
+            .find(|d| d.id == id)
+            .cloned())
+    }
 }
