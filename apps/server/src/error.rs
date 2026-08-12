@@ -11,6 +11,7 @@ pub enum AppError {
     Conflict(String),
     NotFound(String),
     Internal(String),
+    ServiceUnavailable(String),
 }
 
 #[derive(Debug, Serialize)]
@@ -26,6 +27,7 @@ impl IntoResponse for AppError {
             Self::Conflict(message) => (StatusCode::CONFLICT, message),
             Self::NotFound(message) => (StatusCode::NOT_FOUND, message),
             Self::Internal(message) => (StatusCode::INTERNAL_SERVER_ERROR, message),
+            Self::ServiceUnavailable(message) => (StatusCode::SERVICE_UNAVAILABLE, message),
         };
         (
             status,
