@@ -3,13 +3,23 @@
 Telemetry Hub is a learning-oriented, production-shaped telemetry platform.
 Its most important output is its **architecture**: the boundaries, contracts,
 and seams that let a device, a transport, or a storage engine join the platform
-without a rewrite. Contributions are therefore judged primarily on
-architectural discipline, and secondarily on code quality.
+without a rewrite. When reviewing contributions, we care most about whether a
+change respects the existing seams (domain vs. adapter, repository traits,
+etc.) — code quality and test coverage matter too, but architectural fit is
+what we'll usually discuss first in review. This isn't a bar you need to clear
+alone: if you're unsure whether your approach fits, open a draft PR or an
+issue early and we'll figure it out together.
 
 Read [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) before your first
 contribution — it is the decision filter for everything that gets merged.
 [`docs/PROJECT_ANALYSIS.md`](docs/PROJECT_ANALYSIS.md) documents the state of
 the codebase at release-prep time and is the map of known debt.
+
+New to the codebase? Small PRs are genuinely welcome — fixing a typo, adding a
+test, improving an error message. You don't need to understand the full
+architecture before your first contribution; reviewing existing code in
+`crates/core` and `apps/server` is a good way to get oriented, and asking
+questions in an issue before you start is always fine.
 
 ## Ground rules
 
@@ -58,7 +68,10 @@ new numbered file under `migrations/` — **never edit an applied migration**.
 | `apps/server/src/repositories/` | `server` | Traits; `postgres/` holds SQLx implementations and record mapping |
 | `apps/server/src/dto/` | `server` | Request/response contracts |
 | `apps/simulator/src/` | `simulator` | Virtual device |
-| `crates/telemetry`, `crates/transport`, `crates/common` | — | Reserved boundaries; no content until a real consumer exists |
+
+> A `crates/telemetry` (processing pipeline) or `crates/transport` (protocol
+> adapters) crate will be re-created when a real consumer lands (see
+> ROADMAP M3); such future boundaries are not pre-allocated.
 
 ## Coding conventions
 
@@ -122,8 +135,10 @@ Branch from `main`:
 2. Fill the PR description (template in `.github/PULL_REQUEST_TEMPLATE.md`):
    **What** (problem), **Why** (evidence: issue, log, trace), **How**
    (approach, trade-offs, which seam it touches), **Checklist**.
-3. Small PRs are preferred — but a small PR that violates an architecture rule
-   is rejected, while a larger PR that honors the seams is reviewed gladly.
+3. Small PRs are preferred — a small PR that adds business logic directly in a
+   handler will likely need a round of revision to move that logic behind the
+   right trait. That's a normal part of review, not a rejection. A larger PR
+   that already follows the existing seams tends to move through review faster.
 4. Review response is typically a few days. Expect questions about boundary
    placement and contract design; that is the review standard, not a blocker.
 

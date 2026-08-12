@@ -58,8 +58,8 @@ command reproduces the whole stack.
 
 Goal: consumers stop polling; they subscribe.
 
-- ⏳ WebSocket transport in `crates/transport` (the boundary's first real
-  consumer)
+- ⏳ WebSocket transport — a new `crates/transport` crate, re-created when
+  this lands (the boundary's first real consumer)
 - ⏳ Event model wired end-to-end (`TelemetryReceived`, `DeviceConnected`,
   `DeviceDisconnected`, `AlertRaised`)
 - ⏳ Dashboard (Next.js, `frontend/`) consuming the stream, not the database
@@ -86,7 +86,8 @@ Goal: the extensibility axes from the vision start paying off.
 
 - ⏳ MQTT transport (protocol independence — P4)
 - ⏳ Physical devices: ESP32/Arduino as first-class `DeviceType`s
-- ⏳ Alerting pipeline in `crates/telemetry` (severity computed, never carried)
+- ⏳ Alerting pipeline — a new `crates/telemetry` crate, re-created when this
+  lands (severity computed, never carried)
 - ⏳ Timescale-aware storage behind the existing repository traits
 - ⏳ Authentication & authorization (single-tenant era ends deliberately)
 

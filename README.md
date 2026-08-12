@@ -26,10 +26,12 @@ The full identity and decision filter live in
 
 ## Project status
 
-**Pre-release (v0.1.0).** The ingestion path is partially scaffolded and the
-API surface is minimal; breaking changes may land without notice. The README
-describes what exists. The [roadmap](ROADMAP.md) describes what will exist.
-The two never intentionally diverge.
+**Pre-release (v0.1.0).** The end-to-end ingestion path works: a device
+registers itself, sends telemetry, and the samples can be read back through
+the query API — run the [Quick start](#quick-start) to see it live. Breaking
+changes may still land; the README describes what exists, the
+[roadmap](ROADMAP.md) describes what will exist. The two never intentionally
+diverge.
 
 ## Architecture
 
@@ -86,16 +88,12 @@ WebSocket/MQTT, is a new adapter at an existing seam — not a rewrite.
 | Path | Crate | Responsibility | Status |
 |---|---|---|---|
 | `crates/core` | `telemetry_core` | Domain types, enums, conversions. Zero framework dependencies | ✅ Ready |
-| `apps/server` | `server` | HTTP API: config, state, handlers, services, repositories | 🚧 In progress |
-| `apps/simulator` | `simulator` | Virtual device emitting telemetry on an interval | 🚧 In progress |
-| `crates/telemetry` | `telemetry` | Reserved: processing pipeline (validation, enrichment, alerting) | 📦 Reserved |
-| `crates/transport` | `transport` | Reserved: protocol adapters (WebSocket, MQTT) | 📦 Reserved |
-| `crates/common` | `common` | Reserved: shared utilities | 📦 Reserved |
+| `apps/server` | `server` | HTTP API: config, state, handlers, services, repositories | ✅ Working |
+| `apps/simulator` | `simulator` | Virtual device emitting telemetry on an interval | ✅ Working |
 
-The three reserved crates are the boundaries defined by the original
-architecture blueprint, kept as named seams so future work lands in the right
-place. Per the vision, a reserved crate only gains content when a real consumer
-exists; until then it remains an empty boundary.
+The boundaries for a processing pipeline (`crates/telemetry`) and protocol
+adapters (`crates/transport`) were removed until they have a real consumer;
+per the vision, a crate only gains content when a real need exists.
 
 ## Repository tree
 
@@ -144,10 +142,27 @@ cp .env.example .env
 # 3. Run the server (migrations apply automatically at startup)
 cargo run -p server
 
-# 4. Verify
-curl http://127.0.0.1:3000/health
-# → {"status":"ok","service":"telemetry-hub"}
+# 4. Run the simulator (registers SIMULATOR-001, sends telemetry every second)
+cargo run -p simulator
 ```
+
+End-to-end demo (after ~5 seconds of simulator data):
+
+```bash
+# Device registration (the simulator does this automatically on startup)
+curl http://127.0.0.1:3000/api/v1/devices/SIMULATOR-001
+# → {"id":"1269f242-1183-48d8-924b-4102cc47e944","code":"SIMULATOR-001",
+#    "name":"Simulator Device","status":"ONLINE","device_type":"SIMULATOR"}
+
+# Query the 5 newest samples
+curl "http://127.0.0.1:3000/api/v1/telemetry?device_id=1269f242-1183-48d8-924b-4102cc47e944&limit=5"
+# → {"device_id":"1269f242-1183-48d8-924b-4102cc47e944","count":5,
+#    "samples":[{"key":"battery","value":99.91,"unit":"percent","recorded_at":"2026-08-11T17:02:44.003843Z"}, ...]}
+```
+
+Your device id will differ — grab it from the output of the devices curl, then
+use it in the telemetry query. The response is newest-first, `limit` is clamped
+to 1–1000 (default 100).
 
 ## Configuration
 

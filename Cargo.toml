@@ -4,10 +4,7 @@ resolver = "2"
 members = [
   "apps/server",
   "apps/simulator",
-  "crates/common",
   "crates/core",
-  "crates/telemetry",
-  "crates/transport",
 ]
 
 [workspace.dependencies]
