@@ -21,7 +21,12 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
     let config = Config::load().expect("Failed to load config");
-    println!("{:#?}", config);
+    tracing::info!(
+        app_name = %config.app_name,
+        app_host = %config.app_host,
+        app_port = config.app_port,
+        "Server configuration loaded"
+    );
     let pool = database::connect(&config)
         .await
         .expect("Failed to connect to database");
@@ -43,11 +48,28 @@ async fn main() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
-    let app = router::create_router()
-        .with_state(state)
-        .layer(TraceLayer::new_for_http());
+    let trace_layer = TraceLayer::new_for_http()
+        .make_span_with(|request: &axum::http::Request<_>| {
+            tracing::info_span!(
+                "http_request",
+                method = %request.method(),
+                path = %request.uri().path(),
+            )
+        })
+        .on_response(
+            |response: &axum::http::Response<_>,
+             latency: std::time::Duration,
+             _span: &tracing::Span| {
+                tracing::info!(
+                      status = %response.status(),
+                    latency_ms = latency.as_millis(),
+                    "request completed"
+                );
+            },
+        );
+    let app = router::create_router().with_state(state).layer(trace_layer);
 
-    println!("Server Running At http://{}", address);
+    tracing::info!(%address, "Starting server");
     let listener = TcpListener::bind(address)
         .await
         .expect("Failed to bind to address");
