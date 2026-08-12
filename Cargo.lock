@@ -265,10 +265,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "common"
-version = "0.1.0"
-
-[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2026,10 +2022,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "telemetry"
-version = "0.1.0"
-
-[[package]]
 name = "telemetry_core"
 version = "0.1.0"
 dependencies = [
@@ -2279,10 +2271,6 @@ dependencies = [
  "tracing-core",
  "tracing-log",
 ]
-
-[[package]]
-name = "transport"
-version = "0.1.0"
 
 [[package]]
 name = "try-lock"
