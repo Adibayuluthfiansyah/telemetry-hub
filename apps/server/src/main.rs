@@ -39,6 +39,7 @@ async fn main() {
         .parse()
         .expect("Invalid bind address in configuration");
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };

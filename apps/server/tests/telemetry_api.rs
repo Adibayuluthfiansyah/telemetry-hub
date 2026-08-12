@@ -51,6 +51,7 @@ async fn create_telemetry_should_return_201_and_persist_all_metrics() {
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -212,10 +213,11 @@ async fn create_telemetry_should_return_404_when_device_does_not_exist() {
 
     let telemetry_service = TelemetryService::new(
         PostgresDeviceRepository::new(pool.clone()),
-        PostgresTelemetryRepository::new(pool),
+        PostgresTelemetryRepository::new(pool.clone()),
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -256,10 +258,11 @@ async fn create_telemetry_should_return_400_when_metrics_empty() {
 
     let telemetry_service = TelemetryService::new(
         PostgresDeviceRepository::new(pool.clone()),
-        PostgresTelemetryRepository::new(pool),
+        PostgresTelemetryRepository::new(pool.clone()),
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -294,10 +297,11 @@ async fn create_telemetry_should_return_400_when_payload_is_malformed() {
 
     let telemetry_service = TelemetryService::new(
         PostgresDeviceRepository::new(pool.clone()),
-        PostgresTelemetryRepository::new(pool),
+        PostgresTelemetryRepository::new(pool.clone()),
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -359,6 +363,7 @@ async fn get_telemetry_should_return_200_with_samples() {
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -524,6 +529,7 @@ async fn get_telemetry_should_return_200_when_empty() {
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -565,10 +571,11 @@ async fn get_telemetry_should_return_404_when_device_does_not_exist() {
 
     let telemetry_service = TelemetryService::new(
         PostgresDeviceRepository::new(pool.clone()),
-        PostgresTelemetryRepository::new(pool),
+        PostgresTelemetryRepository::new(pool.clone()),
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -601,10 +608,11 @@ async fn get_telemetry_should_return_400_when_device_id_is_missing() {
 
     let telemetry_service = TelemetryService::new(
         PostgresDeviceRepository::new(pool.clone()),
-        PostgresTelemetryRepository::new(pool),
+        PostgresTelemetryRepository::new(pool.clone()),
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -641,10 +649,11 @@ async fn get_telemetry_should_return_400_when_device_id_is_invalid() {
 
     let telemetry_service = TelemetryService::new(
         PostgresDeviceRepository::new(pool.clone()),
-        PostgresTelemetryRepository::new(pool),
+        PostgresTelemetryRepository::new(pool.clone()),
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
@@ -751,6 +760,7 @@ async fn get_telemetry_should_clamp_limit_to_1000() {
     );
 
     let state = AppState {
+        db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
     };
