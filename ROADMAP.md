@@ -18,9 +18,10 @@ Goal: the repo is trustworthy before it gains features.
 - ✅ Server binds `APP_HOST`/`APP_PORT` from configuration
 - ✅ Docker Compose passes `POSTGRES_*` correctly (env override bug fixed)
 - ⏳ CI gate: `fmt` + `clippy -D warnings` + `test` on every PR
-- ⏳ Resolve 23 pre-existing compiler warnings
-- ⏳ Replace `.expect()` with `Result` in DB→domain mapping
-- ⏳ Delete or document the reserved placeholder crates policy
+- ✅ Resolve 23 pre-existing compiler warnings (remaining `.expect()` and
+  CI-gate work is tracked in issue #4)
+- ⏳ Replace `.expect()` with `Result` in DB→domain mapping (issue #4)
+- ✅ Delete or document the reserved placeholder crates policy
 
 **Exit criteria:** clean build with zero warnings; CI green; every doc
 describes only what exists.
@@ -34,7 +35,7 @@ Goal: a telemetry sample can travel device → API → database → query.
   `TelemetryRepository`
 - ✅ `DeviceService::create_device` and the telemetry service layer
 - ✅ Routes: `POST /devices`, `POST /telemetry` using the existing DTOs
-- ⏳ DB-aware `/health` (readiness, not just liveness)
+- ✅ DB-aware `/health` (readiness, not just liveness)
 - ✅ Error-response contract and request validation
 - ✅ Telemetry query endpoint: `GET /telemetry` (data can be read back)
 
@@ -47,9 +48,9 @@ Goal: the platform's first device is real, and the platform is observable.
 - ✅ Real simulator: interval-driven (`SIMULATOR_INTERVAL_MS`), speaking the
   same contract as future hardware (vision principle: the simulator is
   first-class, never a demo path)
-- ⏳ Seed script and development tooling in `scripts/`
-- ⏳ Structured tracing middleware
-- ⏳ Documentation: `docs/database.md`, `docs/simulator.md`
+- ✅ Development tooling in `scripts/` (`dev.sh` — one-command stack)
+- ✅ Structured tracing middleware (request spans + latency logging)
+- ✅ Documentation: `docs/database.md`, `docs/simulator.md`
 
 **Exit criteria:** `cargo run -p simulator` populates the database; a single
 command reproduces the whole stack.

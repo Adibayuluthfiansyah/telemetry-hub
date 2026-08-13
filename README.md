@@ -104,13 +104,11 @@ per the vision, a crate only gains content when a real need exists.
 │   ├── server/                 # Axum API
 │   └── simulator/              # virtual device
 ├── crates/
-│   ├── core/                   # domain (telemetry_core)
-│   ├── telemetry/              # reserved: pipeline
-│   └── transport/              # reserved: protocols
+│   └── core/                   # domain (telemetry_core)
 ├── migrations/                 # SQLx migrations (applied at startup)
 ├── docker/                     # docker-compose.yml (PostgreSQL 17)
 ├── docs/                       # architecture, vision, analysis
-├── scripts/                    # development tooling (WIP)
+├── scripts/                    # development tooling (dev.sh)
 └── .github/                    # issue/PR templates
 ```
 
@@ -132,19 +130,19 @@ per the vision, a crate only gains content when a real need exists.
 Prerequisites: Docker, Rust 1.85+ (edition 2024).
 
 ```bash
-# 1. Start PostgreSQL 17 (host port 5439)
-docker compose -f docker/docker-compose.yml up -d
-
-# 2. Configure environment
+# 1. Configure environment
 cp .env.example .env
 #    edit .env: set DATABASE_URL and POSTGRES_* for your local setup
 
-# 3. Run the server (migrations apply automatically at startup)
-cargo run -p server
-
-# 4. Run the simulator (registers SIMULATOR-001, sends telemetry every second)
-cargo run -p simulator
+# 2. Start the full stack: PostgreSQL, server, simulator
+./scripts/dev.sh
 ```
+
+`scripts/dev.sh` builds the workspace, starts PostgreSQL, waits for real
+readiness, runs the server and the simulator, and tears both down cleanly on
+`Ctrl-C`. Running the pieces manually is still possible: `cargo run -p server`
+(migrations apply automatically at startup), then `cargo run -p simulator`
+(registers `SIMULATOR-001` and sends telemetry every second).
 
 End-to-end demo (after ~5 seconds of simulator data):
 
@@ -198,7 +196,9 @@ Environment variables, read from `.env` via `dotenvy`:
 | Development | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
 | Community | [`SUPPORT.md`](SUPPORT.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) |
 | Security | [`SECURITY.md`](SECURITY.md) |
-| Database / Simulator / API / Deployment | planned — tracked in [ROADMAP.md](ROADMAP.md) |
+| Database | [`docs/database.md`](docs/database.md) |
+| Simulator | [`docs/simulator.md`](docs/simulator.md) |
+| API / Deployment | planned — tracked in [ROADMAP.md](ROADMAP.md) |
 
 ## Contributing
 
