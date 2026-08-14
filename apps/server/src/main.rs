@@ -20,19 +20,22 @@ async fn main() {
         ))
         .with(tracing_subscriber::fmt::layer())
         .init();
-    let config = Config::load().expect("Failed to load config");
+    if let Err(error) = run().await {
+        tracing::error!(error = ?error, "Failed to start server");
+        std::process::exit(1);
+    }
+}
+
+async fn run() -> anyhow::Result<()> {
+    let config = Config::load()?;
     tracing::info!(
         app_name = %config.app_name,
         app_host = %config.app_host,
         app_port = config.app_port,
         "Server configuration loaded"
     );
-    let pool = database::connect(&config)
-        .await
-        .expect("Failed to connect to database");
-    database::run(&pool)
-        .await
-        .expect("Failed to run database migrations");
+    let pool = database::connect(&config).await?;
+    database::run(&pool).await?;
     let device_repository = PostgresDeviceRepository::new(pool.clone());
     let device_service = DeviceService::new(device_repository);
     let telemetry_repository = PostgresTelemetryRepository::new(pool.clone());
@@ -40,9 +43,7 @@ async fn main() {
         PostgresDeviceRepository::new(pool.clone()),
         telemetry_repository,
     );
-    let address: SocketAddr = format!("{}:{}", config.app_host, config.app_port)
-        .parse()
-        .expect("Invalid bind address in configuration");
+    let address: SocketAddr = format!("{}:{}", config.app_host, config.app_port).parse()?;
     let state = AppState {
         db: pool.clone(),
         device_service: Arc::new(device_service),
@@ -68,11 +69,8 @@ async fn main() {
             },
         );
     let app = router::create_router().with_state(state).layer(trace_layer);
-
     tracing::info!(%address, "Starting server");
-    let listener = TcpListener::bind(address)
-        .await
-        .expect("Failed to bind to address");
-
-    axum::serve(listener, app).await.expect("Server Error");
+    let listener = TcpListener::bind(address).await?;
+    axum::serve(listener, app).await?;
+    Ok(())
 }

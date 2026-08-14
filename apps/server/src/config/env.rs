@@ -9,7 +9,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn load() -> anyhow::Result<Self> {
         dotenvy::dotenv()?;
         Ok(Self {
             app_name: env::var("APP_NAME")?,
