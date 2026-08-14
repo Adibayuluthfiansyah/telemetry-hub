@@ -10,22 +10,24 @@ use generator::MetricGenerator;
 
 #[tokio::main]
 async fn main() {
-    let config = Config::load().expect("Failed to load simulator config");
+    if let Err(error) = run().await {
+        eprintln!("Simulator failed: {error}");
+        std::process::exit(1);
+    }
+}
+async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let config = Config::load()?;
     let client = SimulatorClient::new(config.server_url.clone());
     let mut generator = MetricGenerator::new();
     client
         .register_device(&config.device_code, &config.device_name)
-        .await
-        .expect("Failed to register simulator device");
+        .await?;
     let metrics = generator.generate_metrics();
     let telemetry = TelemetryRequest {
         device_code: config.device_code.clone(),
         metrics,
     };
-    client
-        .send_telemetry(&telemetry)
-        .await
-        .expect("Failed to send telemetry");
+    client.send_telemetry(&telemetry).await?;
 
     let mut interval = tokio::time::interval(std::time::Duration::from_millis(config.interval_ms));
 
@@ -69,4 +71,5 @@ async fn main() {
              }
         }
     }
+    Ok(())
 }

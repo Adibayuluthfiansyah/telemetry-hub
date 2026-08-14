@@ -50,7 +50,7 @@ impl DeviceRepository for PostgresDeviceRepository {
             SELECT id, code, name, device_type, status, created_at, updated_at FROM devices WHERE code = $1
             "#,
         ).bind(code).fetch_optional(&self.pool).await?;
-        Ok(record.map(Into::into))
+        record.map(Device::try_from).transpose()
     }
     async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Device>> {
         let record = sqlx::query_as::<_, DeviceRecord>(
@@ -58,6 +58,6 @@ impl DeviceRepository for PostgresDeviceRepository {
             SELECT id, code, name, device_type, status, created_at, updated_at FROM devices WHERE id = $1
             "#,
         ).bind(id).fetch_optional(&self.pool).await?;
-        Ok(record.map(Into::into))
+        record.map(Device::try_from).transpose()
     }
 }

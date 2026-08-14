@@ -1,5 +1,6 @@
 use crate::dto::device::CreateDeviceRequest;
 use crate::dto::telemetry::TelemetryRequest;
+use std::fmt;
 
 pub struct SimulatorClient {
     client: reqwest::Client,
@@ -11,6 +12,27 @@ pub enum ClientError {
     DeviceNotFound,
     Request(reqwest::Error),
     Server(reqwest::StatusCode),
+}
+
+impl fmt::Display for ClientError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::DeviceNotFound => write!(f, "Device not found"),
+            Self::Request(error) => write!(f, "Request failed: {error}"),
+            Self::Server(status) => {
+                write!(f, "Server returned HTTP status {status}")
+            }
+        }
+    }
+}
+
+impl std::error::Error for ClientError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Request(error) => Some(error),
+            Self::DeviceNotFound | Self::Server(_) => None,
+        }
+    }
 }
 
 impl SimulatorClient {
