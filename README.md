@@ -10,6 +10,49 @@ A device-agnostic telemetry platform in Rust. The backend is developed against a
 virtual device simulator first, so hardware — an ESP32, an Arduino, anything —
 is never a prerequisite for building, testing, or extending the platform.
 
+- 🔌 **Hardware-free development** — the simulator is a first-class device, so no hardware is ever required to build or extend the platform
+- 🏗️ **Clean Architecture** — domain logic in `telemetry_core` has zero framework dependencies
+- 🗄️ **PostgreSQL + SQLx** — migrations run automatically at startup
+- 🚀 **One-command stack** — `./scripts/dev.sh` starts the database, API, and simulator
+- 📖 **Honest docs** — README describes what exists; ROADMAP describes what's planned
+
+## Quick start
+
+Prerequisites: Docker, Rust 1.85+ (edition 2024).
+
+```bash
+# 1. Configure environment
+cp .env.example .env
+#    edit .env: set DATABASE_URL and POSTGRES_* for your local setup
+
+# 2. Start the full stack: PostgreSQL, server, simulator
+./scripts/dev.sh
+```
+
+`scripts/dev.sh` builds the workspace, starts PostgreSQL, waits for real
+readiness, runs the server and the simulator, and tears both down cleanly on
+`Ctrl-C`. Running the pieces manually is still possible: `cargo run -p server`
+(migrations apply automatically at startup), then `cargo run -p simulator`
+(registers `SIMULATOR-001` and sends telemetry every second).
+
+End-to-end demo (after ~5 seconds of simulator data):
+
+```bash
+# Device registration (the simulator does this automatically on startup)
+curl http://127.0.0.1:3000/api/v1/devices/SIMULATOR-001
+# → {"id":"1269f242-1183-48d8-924b-4102cc47e944","code":"SIMULATOR-001",
+#    "name":"Simulator Device","status":"ONLINE","device_type":"SIMULATOR"}
+
+# Query the 5 newest samples
+curl "http://127.0.0.1:3000/api/v1/telemetry?device_id=1269f242-1183-48d8-924b-4102cc47e944&limit=5"
+# → {"device_id":"1269f242-1183-48d8-924b-4102cc47e944","count":5,
+#    "samples":[{"key":"battery","value":99.91,"unit":"percent","recorded_at":"2026-08-11T17:02:44.003843Z"}, ...]}
+```
+
+Your device id will differ — grab it from the output of the devices curl, then
+use it in the telemetry query. The response is newest-first, `limit` is clamped
+to 1–1000 (default 100).
+
 ## Why Telemetry Hub exists
 
 Building an IoT backend is usually blocked by a chicken-and-egg problem: the
@@ -34,7 +77,15 @@ changes may still land; the README describes what exists, the
 [roadmap](ROADMAP.md) describes what will exist. The two never intentionally
 diverge.
 
-## Architecture
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) —
+we review PRs for fit with the existing architecture; small, focused changes
+are the easiest to merge. New here? Start with an issue labeled
+[`good first issue`](https://github.com/Adibayuluthfiansyah/telemetry-hub/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+All interactions are governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## For contributors: architecture deep-dive
 
 Telemetry Hub is a Clean Architecture workspace: domain logic lives in one
 place with zero framework dependencies, and everything else is an adapter
@@ -126,43 +177,6 @@ per the vision, a crate only gains content when a real need exists.
 - **Hardware independence.** The simulator speaks the same contract as future
   hardware, so devices are always optional.
 
-## Quick start
-
-Prerequisites: Docker, Rust 1.85+ (edition 2024).
-
-```bash
-# 1. Configure environment
-cp .env.example .env
-#    edit .env: set DATABASE_URL and POSTGRES_* for your local setup
-
-# 2. Start the full stack: PostgreSQL, server, simulator
-./scripts/dev.sh
-```
-
-`scripts/dev.sh` builds the workspace, starts PostgreSQL, waits for real
-readiness, runs the server and the simulator, and tears both down cleanly on
-`Ctrl-C`. Running the pieces manually is still possible: `cargo run -p server`
-(migrations apply automatically at startup), then `cargo run -p simulator`
-(registers `SIMULATOR-001` and sends telemetry every second).
-
-End-to-end demo (after ~5 seconds of simulator data):
-
-```bash
-# Device registration (the simulator does this automatically on startup)
-curl http://127.0.0.1:3000/api/v1/devices/SIMULATOR-001
-# → {"id":"1269f242-1183-48d8-924b-4102cc47e944","code":"SIMULATOR-001",
-#    "name":"Simulator Device","status":"ONLINE","device_type":"SIMULATOR"}
-
-# Query the 5 newest samples
-curl "http://127.0.0.1:3000/api/v1/telemetry?device_id=1269f242-1183-48d8-924b-4102cc47e944&limit=5"
-# → {"device_id":"1269f242-1183-48d8-924b-4102cc47e944","count":5,
-#    "samples":[{"key":"battery","value":99.91,"unit":"percent","recorded_at":"2026-08-11T17:02:44.003843Z"}, ...]}
-```
-
-Your device id will differ — grab it from the output of the devices curl, then
-use it in the telemetry query. The response is newest-first, `limit` is clamped
-to 1–1000 (default 100).
-
 ## Configuration
 
 Environment variables, read from `.env` via `dotenvy`:
@@ -200,13 +214,6 @@ Environment variables, read from `.env` via `dotenvy`:
 | Database | [`docs/database.md`](docs/database.md) |
 | Simulator | [`docs/simulator.md`](docs/simulator.md) |
 | API / Deployment | planned — tracked in [ROADMAP.md](ROADMAP.md) |
-
-## Contributing
-
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) —
-contributions are judged on architectural discipline first, feature count
-second. All interactions are governed by the
-[Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Security
 
