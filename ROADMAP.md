@@ -18,9 +18,9 @@ Goal: the repo is trustworthy before it gains features.
 - ✅ Server binds `APP_HOST`/`APP_PORT` from configuration
 - ✅ Docker Compose passes `POSTGRES_*` correctly (env override bug fixed)
 - ⏳ CI gate: `fmt` + `clippy -D warnings` + `test` on every PR
-- ✅ Resolve 23 pre-existing compiler warnings (remaining `.expect()` and
-  CI-gate work is tracked in issue #4)
-- ⏳ Replace `.expect()` with `Result` in DB→domain mapping (issue #4)
+- ✅ Resolve 23 pre-existing compiler warnings (CI gate tracked in
+  issue #23)
+- ✅ Replace `.expect()` with `Result` in DB→domain mapping (issue #22)
 - ✅ Delete or document the reserved placeholder crates policy
 
 **Exit criteria:** clean build with zero warnings; CI green; every doc
