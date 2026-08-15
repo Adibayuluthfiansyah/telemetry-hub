@@ -17,7 +17,7 @@ Goal: the repo is trustworthy before it gains features.
   CODE_OF_CONDUCT, templates)
 - ✅ Server binds `APP_HOST`/`APP_PORT` from configuration
 - ✅ Docker Compose passes `POSTGRES_*` correctly (env override bug fixed)
-- ⏳ CI gate: `fmt` + `clippy -D warnings` + `test` on every PR
+- ✅ CI gate: `fmt` + `clippy -D warnings` + `test` on every PR (issue #23)
 - ✅ Resolve 23 pre-existing compiler warnings (CI gate tracked in
   issue #23)
 - ✅ Replace `.expect()` with `Result` in DB→domain mapping (issue #22)

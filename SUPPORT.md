@@ -6,12 +6,9 @@ get faster answers. Here is where each kind of help belongs.
 
 ## Questions
 
-**GitHub Discussions** (if enabled on this repository) is the right place for
+**GitHub Discussions** is the right place for
 "how do I…" questions, design discussion, and ideas that are not yet concrete
 enough to be issues.
-
-If Discussions is not enabled, open a regular issue with the question — it
-will be labeled and closed when answered.
 
 Before asking, check:
 
