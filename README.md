@@ -181,7 +181,7 @@ Environment variables, read from `.env` via `dotenvy`:
 
 - Server, simulator, and database run from the workspace root — see
   [CONTRIBUTING.md](CONTRIBUTING.md) for the full engineering handbook.
-- Before every PR: `cargo fmt`, `cargo clippy --workspace -- -D warnings`,
+- Before every PR: `cargo fmt`, `cargo clippy --workspace --all-targets -- -D warnings`,
   `cargo test --workspace`.
 - Migrations are SQLx files in `migrations/`; they run at server startup.
   Append new numbered files — never edit an applied migration.

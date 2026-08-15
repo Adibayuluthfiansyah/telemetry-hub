@@ -1,5 +1,18 @@
 # Contributing to Telemetry Hub
 
+## Start here
+
+```bash
+git clone https://github.com/Adibayuluthfiansyah/telemetry-hub
+cd telemetry-hub && cp .env.example .env
+./scripts/dev.sh    # PostgreSQL + API + simulator, one command
+```
+
+Then pick a
+[`good first issue`](https://github.com/Adibayuluthfiansyah/telemetry-hub/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22),
+say "I'd like to take this", and we'll figure it out together. A typo fix, a
+test, or a doc improvement is a complete contribution.
+
 Telemetry Hub is a learning-oriented, production-shaped telemetry platform.
 Its most important output is its **architecture**: the boundaries, contracts,
 and seams that let a device, a transport, or a storage engine join the platform
@@ -10,8 +23,9 @@ what we'll usually discuss first in review. This isn't a bar you need to clear
 alone: if you're unsure whether your approach fits, open a draft PR or an
 issue early and we'll figure it out together.
 
-Read [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) before your first
-contribution — it is the decision filter for everything that gets merged.
+Read [`docs/PRODUCT_VISION.md`](docs/PRODUCT_VISION.md) when you're ready for a
+substantial design change — it is the decision filter for everything that gets
+merged.
 [`docs/PROJECT_ANALYSIS.md`](docs/PROJECT_ANALYSIS.md) documents the state of
 the codebase at release-prep time and is the map of known debt.
 
@@ -27,7 +41,7 @@ Every PR must pass, before opening:
 
 ```bash
 cargo fmt --all -- --check
-cargo clippy --workspace -- -D warnings
+cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
