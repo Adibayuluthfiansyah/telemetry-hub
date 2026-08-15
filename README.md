@@ -4,6 +4,7 @@
 [![Rust: Edition 2024](https://img.shields.io/badge/rust-edition_2024-orange.svg)](Cargo.toml)
 [![Status: Pre-release](https://img.shields.io/badge/status-pre--release-yellow.svg)](ROADMAP.md)
 [![Database: PostgreSQL 17](https://img.shields.io/badge/database-postgresql_17-336791.svg)](docker/docker-compose.yml)
+[![CI](https://github.com/Adibayuluthfiansyah/telemetry-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/Adibayuluthfiansyah/telemetry-hub/actions/workflows/ci.yml)
 
 A device-agnostic telemetry platform in Rust. The backend is developed against a
 virtual device simulator first, so hardware — an ESP32, an Arduino, anything —
@@ -180,7 +181,7 @@ Environment variables, read from `.env` via `dotenvy`:
 
 - Server, simulator, and database run from the workspace root — see
   [CONTRIBUTING.md](CONTRIBUTING.md) for the full engineering handbook.
-- Before every PR: `cargo fmt`, `cargo clippy --workspace -- -D warnings`,
+- Before every PR: `cargo fmt`, `cargo clippy --workspace --all-targets -- -D warnings`,
   `cargo test --workspace`.
 - Migrations are SQLx files in `migrations/`; they run at server startup.
   Append new numbered files — never edit an applied migration.

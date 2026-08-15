@@ -4,7 +4,7 @@ Thank you for contributing to Telemetry Hub.
 Before opening, the ground rules in CONTRIBUTING.md must pass:
 
   cargo fmt --all -- --check
-  cargo clippy --workspace -- -D warnings
+  cargo clippy --workspace --all-targets -- -D warnings
   cargo test --workspace
 
 This template mirrors the architecture review checklist in CONTRIBUTING.md.
@@ -36,7 +36,7 @@ Seam: `...`
 ## Checklist
 
 - [ ] `cargo fmt --all -- --check` passes
-- [ ] `cargo clippy --workspace -- -D warnings` passes
+- [ ] `cargo clippy --workspace --all-targets -- -D warnings` passes
 - [ ] `cargo test --workspace` passes
 - [ ] No framework imports in `crates/core`
 - [ ] Metrics remain generic (`key`/`value`/`unit`); no device-specific fields
