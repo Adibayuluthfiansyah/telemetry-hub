@@ -1,0 +1,11 @@
+[package]
+name = "telemetry_transport"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+telemetry_core = { path = "../../crates/core" }
+serde = { workspace = true }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["serde"] }

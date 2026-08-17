@@ -24,6 +24,7 @@ async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 
 telemetry_core = { path = "../../crates/core" }
+telemetry_transport = { path = "../../crates/transport" }
 anyhow = "1.0.104"
 
 tracing = { workspace = true }

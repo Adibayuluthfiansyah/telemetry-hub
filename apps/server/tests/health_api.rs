@@ -7,6 +7,7 @@ use axum::{
 use common::test_pool;
 use server::{
     app::create_app,
+    events::publisher::NoopEventPublisher,
     repositories::postgres::{PostgresDeviceRepository, PostgresTelemetryRepository},
     services::{DeviceService, TelemetryService},
     state::AppState,
@@ -29,6 +30,7 @@ async fn health_should_return_200_when_database_is_available() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);

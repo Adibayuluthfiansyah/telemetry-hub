@@ -1,6 +1,6 @@
 use crate::enums::AlertSeverity;
-
-#[derive(Debug, Clone)]
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Alert {
     pub device_id: String,
     pub severity: AlertSeverity,
