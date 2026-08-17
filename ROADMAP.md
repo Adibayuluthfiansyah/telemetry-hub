@@ -59,8 +59,8 @@ command reproduces the whole stack.
 
 Goal: consumers stop polling; they subscribe.
 
-- ⏳ WebSocket transport — a new `crates/transport` crate, re-created when
-  this lands (the boundary's first real consumer)
+- ✅ WebSocket transport — `crates/transport` with `EventEnvelope` +
+  `EventPublisher` (issue #34); receiving side lands in the next step
 - ⏳ Event model wired end-to-end (`TelemetryReceived`, `DeviceConnected`,
   `DeviceDisconnected`, `AlertRaised`)
 - ⏳ Dashboard (Next.js, `frontend/`) consuming the stream, not the database

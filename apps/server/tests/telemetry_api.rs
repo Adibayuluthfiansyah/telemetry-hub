@@ -8,6 +8,7 @@ use common::test_pool;
 use serde_json::json;
 use server::{
     app::create_app,
+    events::publisher::NoopEventPublisher,
     repositories::postgres::{PostgresDeviceRepository, PostgresTelemetryRepository},
     services::{DeviceService, TelemetryService},
     state::AppState,
@@ -54,6 +55,7 @@ async fn create_telemetry_should_return_201_and_persist_all_metrics() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -220,6 +222,7 @@ async fn create_telemetry_should_return_404_when_device_does_not_exist() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -265,6 +268,7 @@ async fn create_telemetry_should_return_400_when_metrics_empty() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -304,6 +308,7 @@ async fn create_telemetry_should_return_400_when_payload_is_malformed() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -366,6 +371,7 @@ async fn get_telemetry_should_return_200_with_samples() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -532,6 +538,7 @@ async fn get_telemetry_should_return_200_when_empty() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -578,6 +585,7 @@ async fn get_telemetry_should_return_404_when_device_does_not_exist() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -615,6 +623,7 @@ async fn get_telemetry_should_return_400_when_device_id_is_missing() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -656,6 +665,7 @@ async fn get_telemetry_should_return_400_when_device_id_is_invalid() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -763,6 +773,7 @@ async fn get_telemetry_should_clamp_limit_to_1000() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);

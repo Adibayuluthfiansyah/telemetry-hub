@@ -1630,6 +1630,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "telemetry_core",
+ "telemetry_transport",
  "tokio",
  "tower",
  "tower-http 0.7.0",
@@ -2027,6 +2028,18 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "serde",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
+name = "telemetry_transport"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "telemetry_core",
  "uuid",
 ]
 

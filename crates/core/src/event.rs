@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::enums::EventType;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Event {
     pub id: Uuid,
     pub event_type: EventType,
@@ -24,5 +25,24 @@ impl Event {
             id,
             created_at,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json;
+    #[test]
+    fn event_round_trips_through_json() -> Result<(), Box<dyn std::error::Error>> {
+        let event = Event::new(
+            EventType::TelemetryReceived,
+            Uuid::new_v4(),
+            Uuid::new_v4(),
+            Utc::now(),
+        );
+        let json = serde_json::to_string(&event)?;
+        let back: Event = serde_json::from_str(&json)?;
+        assert_eq!(event, back);
+        Ok(())
     }
 }

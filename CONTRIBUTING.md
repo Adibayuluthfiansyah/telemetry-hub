@@ -75,6 +75,7 @@ new numbered file under `migrations/` — **never edit an applied migration**.
 | Path | Crate | What lives here |
 |---|---|---|
 | `crates/core/src/` | `telemetry_core` | Domain entities, enums, `Display`/`TryFrom` conversions. No framework imports, ever |
+| `crates/transport/src/` | `telemetry_transport` | Wire contract: serializable `EventEnvelope` built from core events. No framework imports, ever |
 | `apps/server/src/config/` | `server` | Env-based configuration |
 | `apps/server/src/state/` | `server` | `AppState`, injected into the router |
 | `apps/server/src/handlers/` | `server` | HTTP layer, DTO marshalling |
@@ -83,9 +84,8 @@ new numbered file under `migrations/` — **never edit an applied migration**.
 | `apps/server/src/dto/` | `server` | Request/response contracts |
 | `apps/simulator/src/` | `simulator` | Virtual device |
 
-> A `crates/telemetry` (processing pipeline) or `crates/transport` (protocol
-> adapters) crate will be re-created when a real consumer lands (see
-> ROADMAP M3); such future boundaries are not pre-allocated.
+> A `crates/telemetry` (processing pipeline) crate will be re-created when a
+> real consumer lands; such future boundaries are not pre-allocated.
 
 ## Coding conventions
 

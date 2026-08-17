@@ -1,6 +1,7 @@
 use server::{
     config::Config,
     database,
+    events::publisher::BroadcastEventPublisher,
     repositories::postgres::{PostgresDeviceRepository, PostgresTelemetryRepository},
     router,
     services::{DeviceService, TelemetryService},
@@ -43,11 +44,14 @@ async fn run() -> anyhow::Result<()> {
         PostgresDeviceRepository::new(pool.clone()),
         telemetry_repository,
     );
+    let (event_tx, _event_rx) = tokio::sync::broadcast::channel(256);
+    let event_publisher = Arc::new(BroadcastEventPublisher::new(event_tx));
     let address: SocketAddr = format!("{}:{}", config.app_host, config.app_port).parse()?;
     let state = AppState {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher,
     };
     let trace_layer = TraceLayer::new_for_http()
         .make_span_with(|request: &axum::http::Request<_>| {

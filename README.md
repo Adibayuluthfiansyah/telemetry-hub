@@ -140,12 +140,12 @@ WebSocket/MQTT, is a new adapter at an existing seam — not a rewrite.
 | Path | Crate | Responsibility | Status |
 |---|---|---|---|
 | `crates/core` | `telemetry_core` | Domain types, enums, conversions. Zero framework dependencies | ✅ Ready |
+| `crates/transport` | `telemetry_transport` | Wire contract: serde `EventEnvelope` for core events. Zero framework dependencies | ✅ Ready |
 | `apps/server` | `server` | HTTP API: config, state, handlers, services, repositories | ✅ Working |
 | `apps/simulator` | `simulator` | Virtual device emitting telemetry on an interval | ✅ Working |
 
-The boundaries for a processing pipeline (`crates/telemetry`) and protocol
-adapters (`crates/transport`) were removed until they have a real consumer;
-per the vision, a crate only gains content when a real need exists.
+The boundary for a processing pipeline (`crates/telemetry`) is not yet
+allocated; per the vision, a crate only gains content when a real need exists.
 
 ## Repository tree
 
@@ -156,7 +156,8 @@ per the vision, a crate only gains content when a real need exists.
 │   ├── server/                 # Axum API
 │   └── simulator/              # virtual device
 ├── crates/
-│   └── core/                   # domain (telemetry_core)
+│   ├── core/                   # domain (telemetry_core)
+│   └── transport/              # wire contract (EventEnvelope)
 ├── migrations/                 # SQLx migrations (applied at startup)
 ├── docker/                     # docker-compose.yml (PostgreSQL 17)
 ├── docs/                       # architecture, vision, analysis

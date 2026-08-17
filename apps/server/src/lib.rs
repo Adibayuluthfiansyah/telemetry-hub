@@ -3,6 +3,7 @@ pub mod config;
 pub mod database;
 pub mod dto;
 pub mod error;
+pub mod events;
 pub mod handlers;
 pub mod repositories;
 pub mod router;

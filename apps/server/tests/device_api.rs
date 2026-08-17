@@ -8,6 +8,7 @@ use common::test_pool;
 use serde_json::json;
 use server::{
     app::create_app,
+    events::publisher::NoopEventPublisher,
     repositories::postgres::{PostgresDeviceRepository, PostgresTelemetryRepository},
     services::{DeviceService, TelemetryService},
     state::AppState,
@@ -36,6 +37,7 @@ async fn create_device_should_return_409_when_code_exist() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -85,6 +87,7 @@ async fn get_device_should_return_200_when_device_exists() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
@@ -145,6 +148,7 @@ async fn get_device_should_return_404_when_device_does_not_exist() {
         db: pool.clone(),
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
     };
 
     let app = create_app(state);
