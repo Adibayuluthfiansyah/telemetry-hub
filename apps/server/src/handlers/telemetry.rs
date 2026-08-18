@@ -30,14 +30,20 @@ pub async fn create_telemetry(
                 AppError::Internal(message)
             }
         })?;
-    state
-        .event_publisher
-        .publish(EventEnvelope::from(Event::new(
-            EventType::TelemetryReceived,
-            telemetry.device_id,
-            telemetry.id,
-            telemetry.recorded_at,
-        )));
+    let envelope = EventEnvelope::from(Event::new(
+        EventType::TelemetryReceived,
+        telemetry.device_id,
+        telemetry.id,
+        telemetry.recorded_at,
+    ));
+    let envelope = match serde_json::to_value(&telemetry.metrics) {
+        Ok(metrics) => envelope.with_payload(serde_json::json!({ "metrics": metrics })),
+        Err(error) => {
+            tracing::error!(?error, "failed to serialize metrics payload");
+            envelope
+        }
+    };
+    state.event_publisher.publish(envelope);
     Ok((
         StatusCode::CREATED,
         Json(TelemetryResponse {

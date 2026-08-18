@@ -89,6 +89,18 @@ async fn build_state(pool: sqlx::PgPool) -> (AppState, broadcast::Sender<EventEn
 async fn stream_delivers_live_events() {
     let pool = test_pool().await;
 
+    sqlx::query(
+        r#"
+        DELETE FROM telemetry
+        WHERE device_id IN (
+            SELECT id FROM devices WHERE code = 'WS-TEST-001'
+        )
+        "#,
+    )
+    .execute(&pool)
+    .await
+    .expect("failed to clean test telemetry");
+
     sqlx::query("DELETE FROM devices WHERE code = 'WS-TEST-001'")
         .execute(&pool)
         .await
@@ -128,11 +140,30 @@ async fn stream_delivers_live_events() {
 
     let received = receive_envelope(&mut socket, EventType::TelemetryReceived).await;
     assert_eq!(received.device_id, device_id);
+    let payload = received
+        .payload
+        .as_ref()
+        .expect("telemetry event carries a payload");
+    assert_eq!(payload["metrics"][0]["key"], "cpu");
+    assert_eq!(payload["metrics"][0]["value"], 42.5);
+    assert_eq!(payload["metrics"][0]["unit"], "percent");
 }
 
 #[tokio::test]
 async fn stream_filters_events_for_other_devices() {
     let pool = test_pool().await;
+
+    sqlx::query(
+        r#"
+        DELETE FROM telemetry
+        WHERE device_id IN (
+            SELECT id FROM devices WHERE code = 'WS-TEST-002'
+        )
+        "#,
+    )
+    .execute(&pool)
+    .await
+    .expect("failed to clean test telemetry");
 
     sqlx::query("DELETE FROM devices WHERE code = 'WS-TEST-002'")
         .execute(&pool)
