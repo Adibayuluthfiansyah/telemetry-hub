@@ -172,7 +172,15 @@ extension, since OpenAPI has no native WebSocket path type).
   "event_type": "TELEMETRY_RECEIVED",
   "device_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
   "created_at": "2026-08-18T14:30:00Z",
-  "payload": null
+  "payload": {
+    "metrics": [
+      {
+        "key": "temperature",
+        "value": 20.31,
+        "unit": "celsius"
+      }
+    ]
+  }
 }
 ```
 
@@ -182,14 +190,14 @@ extension, since OpenAPI has no native WebSocket path type).
 | `event_type` | string | `TELEMETRY_RECEIVED`, `DEVICE_CONNECTED`, `DEVICE_DISCONNECTED`, `ALERT_RAISED` |
 | `device_id` | UUID | Source device |
 | `created_at` | RFC3339 UTC | When the event occurred |
-| `payload` | object/null | Optional structured payload (unused today) |
+| `payload` | object/null | `TELEMETRY_RECEIVED`: `{ "metrics": [ {key, value, unit} ] }`. Other event types: `null` or their own shape |
 
 ### Emitted events (today)
 
-| Event | Trigger | Timestamp |
-|---|---|---|
-| `DEVICE_CONNECTED` | Successful `POST /api/v1/devices` (201) | Registration time |
-| `TELEMETRY_RECEIVED` | Successful `POST /api/v1/telemetry` (201) | Recording time |
+| Event | Trigger | Payload | Timestamp |
+|---|---|---|---|
+| `DEVICE_CONNECTED` | Successful `POST /api/v1/devices` (201) | `null` | Registration time |
+| `TELEMETRY_RECEIVED` | Successful `POST /api/v1/telemetry` (201) | `{ "metrics": [ {key, value, unit} ] }` | Recording time |
 
 ### Honest limitations
 
@@ -208,6 +216,20 @@ extension, since OpenAPI has no native WebSocket path type).
   frame.
 - No ping/pong heartbeat is implemented; a silent, half-open connection is only
   noticed when a send fails.
+
+### Quick verification
+
+1. `./scripts/dev.sh` — starts PostgreSQL, the server, and the simulator
+2. Open `http://localhost:3000/api/v1/health` in a browser tab (health JSON)
+3. F12 → Console → paste:
+
+   ```js
+   const ws = new WebSocket("ws://localhost:3000/api/v1/stream");
+   ws.onmessage = e => console.log(JSON.parse(e.data));
+   ```
+
+4. While the simulator runs, `TELEMETRY_RECEIVED` events arrive with
+   `payload.metrics` (key/value/unit) — the dashboard contract (issue #25)
 
 ## OpenAPI
 
