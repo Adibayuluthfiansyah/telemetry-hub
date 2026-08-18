@@ -1,0 +1,198 @@
+openapi: 3.1.0
+info:
+  title: Telemetry Hub API
+  version: 0.1.0
+  description: >
+    HTTP API of the Telemetry Hub server. The WebSocket stream endpoint
+    (`/api/v1/stream`) is documented in docs/api.md — this spec carries it as
+    an `x-websocket` extension because OpenAPI has no native WebSocket type.
+servers:
+  - url: http://localhost:3000
+    description: Development default (configured via APP_HOST/APP_PORT; see .env.example)
+paths:
+  /api/v1/health:
+    get:
+      summary: Readiness check
+      description: Verifies the database answers SELECT 1 within 2 seconds.
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, service, database]
+                properties:
+                  status: { type: string, example: ok }
+                  service: { type: string, example: telemetry-hub }
+                  database: { type: string, example: up }
+        "503":
+          $ref: "#/components/responses/Error"
+  /api/v1/devices:
+    post:
+      summary: Register a device
+      description: Emits a DEVICE_CONNECTED event on the WebSocket stream (201).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeviceRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceResponse"
+        "400":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+  /api/v1/devices/{code}:
+    get:
+      summary: Fetch a device by code
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceResponse"
+        "404":
+          $ref: "#/components/responses/Error"
+  /api/v1/telemetry:
+    get:
+      summary: Query stored telemetry
+      parameters:
+        - name: device_id
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+      responses:
+        "200":
+          description: Stored samples
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelemetryQueryResponse"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    post:
+      summary: Insert telemetry for a device
+      description: Emits a TELEMETRY_RECEIVED event on the WebSocket stream (201).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelemetryRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelemetryResponse"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "500":
+          $ref: "#/components/responses/Error"
+  /api/v1/stream:
+    get:
+      summary: Live WebSocket event stream
+      x-websocket: true
+      description: >
+        WebSocket endpoint, not HTTP. Live-only event stream; see docs/api.md
+        for the envelope schema, emitted events, and honest limitations.
+      parameters:
+        - name: device_id
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+components:
+  schemas:
+    CreateDeviceRequest:
+      type: object
+      required: [code, name, device_type]
+      properties:
+        code: { type: string, example: sensor-01 }
+        name: { type: string, example: Hall sensor }
+        device_type: { $ref: "#/components/schemas/DeviceType" }
+    DeviceType:
+      type: string
+      enum: [SIMULATOR, ESP32, ARDUINO]
+    DeviceResponse:
+      type: object
+      required: [id, code, name, status, device_type]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        status: { type: string, enum: [ONLINE, OFFLINE, ERROR] }
+        device_type: { $ref: "#/components/schemas/DeviceType" }
+    TelemetryRequest:
+      type: object
+      required: [device_code, metrics]
+      properties:
+        device_code: { type: string, example: sensor-01 }
+        metrics:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/MetricRequest" }
+    MetricRequest:
+      type: object
+      required: [key, value, unit]
+      properties:
+        key: { type: string, example: cpu }
+        value: { type: number, example: 42.5 }
+        unit: { type: string, example: percent }
+    TelemetryResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string }
+    TelemetryQueryResponse:
+      type: object
+      required: [device_id, count, samples]
+      properties:
+        device_id: { type: string, format: uuid }
+        count: { type: integer, example: 1 }
+        samples:
+          type: array
+          items: { $ref: "#/components/schemas/TelemetrySampleResponse" }
+    TelemetrySampleResponse:
+      type: object
+      required: [key, value, unit, recorded_at]
+      properties:
+        key: { type: string, example: cpu }
+        value: { type: number, example: 42.5 }
+        unit: { type: string, example: percent }
+        recorded_at: { type: string, format: date-time }
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [success, message]
+            properties:
+              success: { type: boolean, example: false }
+              message: { type: string }

@@ -214,7 +214,8 @@ Environment variables, read from `.env` via `dotenvy`:
 | Security | [`SECURITY.md`](SECURITY.md) |
 | Database | [`docs/database.md`](docs/database.md) |
 | Simulator | [`docs/simulator.md`](docs/simulator.md) |
-| API / Deployment | planned — tracked in [ROADMAP.md](ROADMAP.md) |
+| API reference | [`docs/api.md`](docs/api.md) (+ [OpenAPI](docs/openapi.yaml)) |
+| Deployment | planned — tracked in [ROADMAP.md](ROADMAP.md) |
 
 ## Security
 

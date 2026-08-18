@@ -65,7 +65,8 @@ Goal: consumers stop polling; they subscribe.
   live via `/api/v1/stream` (issue #35); `DeviceDisconnected`/`AlertRaised`
   await heartbeat detection & the M5 alerting pipeline
 - ⏳ Dashboard (Next.js, `frontend/`) consuming the stream, not the database
-- ⏳ Documentation: `docs/api.md` (OpenAPI)
+- ✅ Documentation: `docs/api.md` (OpenAPI) — all live endpoints
+  documented, including the WebSocket stream (issue #26)
 
 **Exit criteria:** a browser shows live telemetry pushed over WebSocket.
 
