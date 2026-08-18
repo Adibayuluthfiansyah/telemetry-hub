@@ -14,6 +14,7 @@ use server::{
     state::AppState,
 };
 use std::sync::Arc;
+use tokio::sync::broadcast;
 use tower::ServiceExt;
 
 #[tokio::test]
@@ -56,6 +57,7 @@ async fn create_telemetry_should_return_201_and_persist_all_metrics() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -223,6 +225,7 @@ async fn create_telemetry_should_return_404_when_device_does_not_exist() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -269,6 +272,7 @@ async fn create_telemetry_should_return_400_when_metrics_empty() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -309,6 +313,7 @@ async fn create_telemetry_should_return_400_when_payload_is_malformed() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -372,6 +377,7 @@ async fn get_telemetry_should_return_200_with_samples() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -539,6 +545,7 @@ async fn get_telemetry_should_return_200_when_empty() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -586,6 +593,7 @@ async fn get_telemetry_should_return_404_when_device_does_not_exist() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -624,6 +632,7 @@ async fn get_telemetry_should_return_400_when_device_id_is_missing() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -666,6 +675,7 @@ async fn get_telemetry_should_return_400_when_device_id_is_invalid() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -774,6 +784,7 @@ async fn get_telemetry_should_clamp_limit_to_1000() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);

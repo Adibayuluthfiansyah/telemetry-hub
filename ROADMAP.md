@@ -61,8 +61,9 @@ Goal: consumers stop polling; they subscribe.
 
 - ✅ WebSocket transport — `crates/transport` with `EventEnvelope` +
   `EventPublisher` (issue #34); receiving side lands in the next step
-- ⏳ Event model wired end-to-end (`TelemetryReceived`, `DeviceConnected`,
-  `DeviceDisconnected`, `AlertRaised`)
+- ✅ Event model wired end-to-end — `TelemetryReceived` + `DeviceConnected`
+  live via `/api/v1/stream` (issue #35); `DeviceDisconnected`/`AlertRaised`
+  await heartbeat detection & the M5 alerting pipeline
 - ⏳ Dashboard (Next.js, `frontend/`) consuming the stream, not the database
 - ⏳ Documentation: `docs/api.md` (OpenAPI)
 
