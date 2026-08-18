@@ -4,6 +4,8 @@ use crate::services::TelemetryService;
 use crate::services::device_service::DeviceService;
 use sqlx::PgPool;
 use std::sync::Arc;
+use telemetry_transport::EventEnvelope;
+use tokio::sync::broadcast;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -12,4 +14,5 @@ pub struct AppState {
     pub telemetry_service:
         Arc<TelemetryService<PostgresDeviceRepository, PostgresTelemetryRepository>>,
     pub event_publisher: Arc<dyn EventPublisher>,
+    pub event_tx: broadcast::Sender<EventEnvelope>,
 }

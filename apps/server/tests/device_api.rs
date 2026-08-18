@@ -14,6 +14,7 @@ use server::{
     state::AppState,
 };
 use std::sync::Arc;
+use tokio::sync::broadcast;
 use tower::ServiceExt;
 
 #[tokio::test]
@@ -38,6 +39,7 @@ async fn create_device_should_return_409_when_code_exist() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -88,6 +90,7 @@ async fn get_device_should_return_200_when_device_exists() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);
@@ -149,6 +152,7 @@ async fn get_device_should_return_404_when_device_does_not_exist() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);

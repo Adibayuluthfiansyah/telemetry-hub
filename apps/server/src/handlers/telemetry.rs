@@ -8,13 +8,15 @@ use axum::{
     extract::{Query, State, rejection::JsonRejection, rejection::QueryRejection},
     http::StatusCode,
 };
+use telemetry_core::{Event, EventType};
+use telemetry_transport::EventEnvelope;
 
 pub async fn create_telemetry(
     State(state): State<AppState>,
     request: Result<Json<TelemetryRequest>, JsonRejection>,
 ) -> Result<(StatusCode, Json<TelemetryResponse>), AppError> {
     let Json(request) = request?;
-    state
+    let telemetry = state
         .telemetry_service
         .create_telemetry(request)
         .await
@@ -28,7 +30,14 @@ pub async fn create_telemetry(
                 AppError::Internal(message)
             }
         })?;
-
+    state
+        .event_publisher
+        .publish(EventEnvelope::from(Event::new(
+            EventType::TelemetryReceived,
+            telemetry.device_id,
+            telemetry.id,
+            telemetry.recorded_at,
+        )));
     Ok((
         StatusCode::CREATED,
         Json(TelemetryResponse {

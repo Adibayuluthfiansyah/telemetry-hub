@@ -3,7 +3,7 @@ use axum::{
     routing::{get, post},
 };
 
-use crate::handlers::{device, telemetry};
+use crate::handlers::{device, stream, telemetry};
 use crate::{handlers::health, state::AppState};
 
 pub fn create_router() -> Router<AppState> {
@@ -14,6 +14,8 @@ pub fn create_router() -> Router<AppState> {
         .route(
             "/telemetry",
             get(telemetry::get_telemetry).post(telemetry::create_telemetry),
-        );
+        )
+        .route("/stream", get(stream::stream));
+
     Router::new().nest("/api/v1", api_v1)
 }

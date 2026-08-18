@@ -13,6 +13,7 @@ use server::{
     state::AppState,
 };
 use std::sync::Arc;
+use tokio::sync::broadcast;
 use tower::ServiceExt;
 
 #[tokio::test]
@@ -31,6 +32,7 @@ async fn health_should_return_200_when_database_is_available() {
         device_service: Arc::new(device_service),
         telemetry_service: Arc::new(telemetry_service),
         event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
     };
 
     let app = create_app(state);

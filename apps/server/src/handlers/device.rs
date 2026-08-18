@@ -8,6 +8,8 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use telemetry_core::{Event, EventType};
+use telemetry_transport::EventEnvelope;
 
 pub async fn create_device(
     State(state): State<AppState>,
@@ -25,6 +27,14 @@ pub async fn create_device(
                 AppError::Internal(message)
             }
         })?;
+    state
+        .event_publisher
+        .publish(EventEnvelope::from(Event::new(
+            EventType::DeviceConnected,
+            device.id,
+            device.id,
+            chrono::Utc::now(),
+        )));
     let response = DeviceResponse {
         id: device.id,
         code: device.code,
