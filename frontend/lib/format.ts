@@ -123,6 +123,23 @@ export function formatAbsoluteTime(
   });
 }
 
+/** Format ISO timestamp to UTC mission-clock style: "00:12:43.102 UTC". */
+export function formatUtcTimestamp(
+  isoString: string,
+  options: { showMs?: boolean } = {},
+): string {
+  const { showMs = true } = options;
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return "—";
+
+  const pad = (n: number, width = 2) => String(n).padStart(width, "0");
+  const hh = pad(date.getUTCHours());
+  const mm = pad(date.getUTCMinutes());
+  const ss = pad(date.getUTCSeconds());
+  const ms = showMs ? `.${pad(date.getUTCMilliseconds(), 3)}` : "";
+  return `${hh}:${mm}:${ss}${ms} UTC`;
+}
+
 export function formatBytes(bytes: number, decimals = 1): string {
   if (!Number.isFinite(bytes) || bytes < 0) return "—";
   if (bytes === 0) return "0 B";

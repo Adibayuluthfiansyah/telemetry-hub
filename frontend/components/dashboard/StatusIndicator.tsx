@@ -49,7 +49,7 @@ export function StatusIndicator({
         aria-hidden="true"
       />
       {showLabel && (
-        <span className={cn("font-label-caps text-label-caps", "text-on-surface-variant")}>
+        <span className={cn("font-label-caps text-[11px] leading-4", "text-on-surface-variant")}>
           {displayLabel}
         </span>
       )}

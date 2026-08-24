@@ -40,17 +40,17 @@ export function TelemetryPanel({ metrics, connection, targetDeviceId, className 
   ];
 
   return (
-    <Card className={cn("flex flex-col h-full min-h-0", className)}>
+    <Card className={cn("flex flex-col h-full min-h-0 border-border [--card-spacing:0px]", className)}>
       <CardHeader className="border-b border-border p-3 bg-surface-container shrink-0 flex items-center justify-between">
-        <CardTitle className="font-label-caps text-label-caps text-primary">LATEST TELEMETRY</CardTitle>
+        <CardTitle className="font-label-caps text-[11px] leading-4 text-primary">LATEST TELEMETRY</CardTitle>
         <StatusIndicator status={connection === "live" ? "live" : "connecting"} size="sm" />
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-        {!targetDeviceId ? (
+        {targetDeviceId ? (
           <div className="flex flex-col gap-1 border-b border-border pb-3">
-            <div className="font-data-mono text-[10px] text-on-surface-variant">TARGET ID</div>
-            <div className="font-data-mono-lg text-data-mono-lg text-on-surface tracking-widest">
-              {targetDeviceId ?? "—"}
+            <div className="font-data-mono text-[10px] leading-3 text-on-surface-variant">TARGET ID</div>
+            <div className="font-data-mono-lg text-[16px] leading-5 text-on-surface tracking-widest">
+              {targetDeviceId}
             </div>
             <div className="flex items-center gap-2 mt-1">
               <StatusIndicator

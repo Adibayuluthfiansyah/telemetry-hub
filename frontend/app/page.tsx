@@ -39,25 +39,25 @@ export default function Page() {
       bufferUsage={{ used: bufferUsed, total: 50 }}
     >
       <div className="flex flex-col gap-[4px] px-[4px] py-2">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-wider">
+        <h1 className="font-headline-lg text-[24px] leading-8 text-on-surface uppercase tracking-wider">
           LIVE TELEMETRY OPERATIONS
         </h1>
-        <p className="font-data-mono text-data-mono text-on-surface-variant">
+        <p className="font-data-mono text-[13px] leading-[18px] text-on-surface-variant">
           Real-time device telemetry stream
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-[1px] bg-border border-border">
-        <KPICard label="ACTIVE DEVICES" value={activeDevices} status={streamStatus.status} />
-        <KPICard label="EVENTS RECEIVED" value={totalEvents} status="live" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-[1px] bg-border border-border">
+        <KPICard label="ACTIVE DEVICES" value={String(activeDevices).padStart(2, "0")} status={streamStatus.status} />
+        <KPICard label="EVENTS RECEIVED" value={`>${String(totalEvents).padStart(6, "0")}`} status="live" />
         <KPICard label="STREAM STATUS" value={streamStatus.label} status={streamStatus.status} />
       </div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-10 gap-[1px] bg-border border-border min-h-0">
-        <div className="lg:col-span-7 min-h-0">
+        <div className="lg:col-span-7 min-h-[420px] lg:min-h-0">
           <EventFeed events={events} connection={connection} />
         </div>
-        <div className="lg:col-span-3 min-h-0">
+        <div className="lg:col-span-3 min-h-[420px] lg:min-h-0">
           <TelemetryPanel
             metrics={latestMetrics}
             connection={connection}

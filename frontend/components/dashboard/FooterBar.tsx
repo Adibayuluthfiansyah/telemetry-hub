@@ -24,14 +24,14 @@ export function FooterBar({
 
   return (
     <footer className={cn(
-      "bg-surface-container-lowest border-t border-border flat no-shadows fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-[16px] h-8 pl-[64px] md:pl-[80px]",
+      "shrink-0 w-full bg-surface-container-lowest border-t border-border flex justify-between items-center px-[16px] h-8",
       className
     )}>
-      <div className="font-data-mono text-[10px] text-primary flex items-center gap-2">
+      <div className="font-data-mono text-[10px] leading-3 text-primary flex items-center gap-2">
         <StatusIndicator status={statusType} size="sm" showLabel={false} />
         <span>{statusLabel}</span>
       </div>
-      <div className="flex items-center gap-6 font-data-mono text-[10px] text-on-surface-variant">
+      <div className="flex items-center gap-6 font-data-mono text-[10px] leading-3 text-on-surface-variant">
         <span>EVENTS {eventCount}</span>
         <span>DEVICES {deviceCount}</span>
         <span>BUFFER {bufferUsage.used}/{bufferUsage.total}</span>
