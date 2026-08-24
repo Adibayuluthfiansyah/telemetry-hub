@@ -19,13 +19,13 @@ export function TopBar({ connection, className }: TopBarProps) {
       className
     )}>
       <div className="flex items-center gap-4">
-        <div className="font-headline-md text-headline-md font-bold text-primary tracking-tight">
+        <div className="font-headline-md text-[18px] leading-6 font-bold text-primary tracking-tight">
           TELEMETRY HUB
         </div>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="font-data-mono text-[11px] text-primary flex items-center gap-2">
+        <div className="font-data-mono text-[11px] leading-4 text-primary flex items-center gap-2">
           <StatusIndicator status={statusType} size="sm" showLabel={false} />
           <span>{statusLabel}</span>
         </div>

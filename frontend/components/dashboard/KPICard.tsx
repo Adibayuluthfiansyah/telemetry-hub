@@ -24,15 +24,15 @@ export function KPICard({ label, value, status = "live", icon, className }: KPIC
   return (
     <Card
       className={cn(
-        "bg-surface-container hover:bg-surface-container-low transition-colors p-3 flex flex-col justify-between",
+        "bg-surface-container hover:bg-surface-container-low transition-colors p-3 flex flex-col justify-between border-border [--card-spacing:0px]",
         className
       )}
     >
       <CardContent className="flex flex-col gap-2 p-0">
-        <div className="font-label-caps text-label-caps text-on-surface-variant">
+        <div className="font-label-caps text-[11px] leading-4 text-on-surface-variant">
           {label}
         </div>
-        <div className="font-data-mono-lg text-data-mono-lg text-on-surface flex items-center gap-2">
+        <div className="font-data-mono-lg text-[16px] leading-5 text-on-surface flex items-center gap-2">
           <StatusIndicator status={indicatorStatus} size="sm" />
           {icon}
           <span>{value}</span>

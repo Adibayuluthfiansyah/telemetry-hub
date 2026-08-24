@@ -37,15 +37,15 @@ export function MetricReadout({
     <Card
       key={metricKey}
       className={cn(
-        "bg-surface-container-lowest border-border p-3 flex flex-col gap-1",
+        "bg-surface-container-lowest border-border p-3 flex flex-col gap-1 [--card-spacing:0px]",
         className
       )}
     >
       <CardContent className="flex flex-col gap-1 p-0">
-        <div className="font-label-caps text-[9px] text-on-surface-variant uppercase tracking-wider">
+        <div className="font-label-caps text-[9px] leading-3 text-on-surface-variant uppercase tracking-wider">
           {label}
         </div>
-        <div className="font-data-mono text-3xl font-light text-on-surface flex items-baseline gap-1">
+        <div className="font-data-mono text-3xl leading-9 font-light text-on-surface flex items-baseline gap-0.5">
           <span>{formattedValue}</span>
           <span className="text-sm text-on-surface-variant font-normal">{unitLabel}</span>
         </div>
