@@ -17,26 +17,35 @@ const navItems = [
 
 export function Sidebar({ className }: SidebarProps) {
   return (
-    <nav className={cn(
-      "bg-surface-container-low border-r border-border flat no-shadows flex flex-col h-full w-20 md:w-24 py-4 items-center shrink-0 z-20",
-      className
-    )} aria-label="Main navigation">
+    <nav
+      className={cn(
+        "bg-surface-container-low border-r border-border flat no-shadows flex flex-col h-full w-20 md:w-24 py-4 items-center shrink-0 z-20",
+        className,
+      )}
+      aria-label="Main navigation"
+    >
       <div className="mb-8 flex flex-col items-center">
         <div className="w-10 h-10 bg-surface-container flex items-center justify-center border border-border mb-2 rounded-none">
           <span className="material-symbols-outlined text-primary text-xl">memory</span>
         </div>
-        <div className="font-label-caps text-[11px] leading-4 font-bold text-on-surface text-center whitespace-nowrap">NODE_01</div>
-        <div className="font-data-mono text-[9px] leading-3 text-primary mt-1 whitespace-nowrap">OPERATIONAL</div>
+        <div className="font-label-caps text-[11px] leading-4 font-bold text-on-surface text-center whitespace-nowrap">
+          NODE_01
+        </div>
+        <div className="font-data-mono text-[9px] leading-3 text-primary mt-1 whitespace-nowrap">
+          OPERATIONAL
+        </div>
       </div>
 
       <div className="flex-1 w-full flex flex-col items-center space-y-4">
         {navItems.slice(0, 2).map((item) => (
           <Button
             key={item.id}
-            variant={item.active ? "default" : "ghost"}
+            variant="ghost"
             className={cn(
-              "group w-full flex flex-col items-center py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border-l-2",
-              item.active ? "border-primary bg-surface-container-high opacity-80" : "border-transparent"
+              "group h-auto w-full flex flex-col items-center py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border-l-2",
+              item.active
+                ? "text-primary border-primary bg-surface-container-high"
+                : "border-transparent",
             )}
             aria-current={item.active ? "page" : undefined}
           >
