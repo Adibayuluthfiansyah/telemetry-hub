@@ -64,7 +64,7 @@ Goal: consumers stop polling; they subscribe.
 - ✅ Event model wired end-to-end — `TelemetryReceived` + `DeviceConnected`
   live via `/api/v1/stream` (issue #35); `DeviceDisconnected`/`AlertRaised`
   await heartbeat detection & the M5 alerting pipeline
-- ⏳ Dashboard (Next.js, `frontend/`) consuming the stream, not the database
+- ✅ Dashboard (Next.js, `frontend/`) consuming the stream, not the database — [#25](https://github.com/Adibayuluthfiansyah/telemetry-hub/issues/25), [#44](https://github.com/Adibayuluthfiansyah/telemetry-hub/issues/44)
 - ✅ Documentation: `docs/api.md` (OpenAPI) — all live endpoints
   documented, including the WebSocket stream (issue #26)
 
