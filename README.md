@@ -53,6 +53,19 @@ Your device id will differ — grab it from the output of the devices curl, then
 use it in the telemetry query. The response is newest-first, `limit` is clamped
 to 1–1000 (default 100).
 
+### Live dashboard
+
+The live dashboard shows telemetry pushed over WebSocket in real time.
+
+```bash
+./scripts/dev.sh
+# → API at http://localhost:3000, dashboard at http://localhost:3001
+```
+
+Open the dashboard in a browser — events appear within seconds of the
+simulator starting. The stream is at `GET /api/v1/stream` (WebSocket) with a
+live-only broadcast; no database polling.
+
 ## Why Telemetry Hub exists
 
 Building an IoT backend is usually blocked by a chicken-and-egg problem: the
@@ -215,6 +228,7 @@ Environment variables, read from `.env` via `dotenvy`:
 | Database | [`docs/database.md`](docs/database.md) |
 | Simulator | [`docs/simulator.md`](docs/simulator.md) |
 | API reference | [`docs/api.md`](docs/api.md) (+ [OpenAPI](docs/openapi.yaml)) |
+| Dashboard | [`frontend/`](frontend/) — Next.js 16 + shadcn/ui read-only console (WebSocket stream) |
 | Deployment | planned — tracked in [ROADMAP.md](ROADMAP.md) |
 
 ## Security
