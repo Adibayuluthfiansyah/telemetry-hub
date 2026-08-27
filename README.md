@@ -229,7 +229,7 @@ Environment variables, read from `.env` via `dotenvy`:
 | Simulator | [`docs/simulator.md`](docs/simulator.md) |
 | API reference | [`docs/api.md`](docs/api.md) (+ [OpenAPI](docs/openapi.yaml)) |
 | Dashboard | [`frontend/`](frontend/) — Next.js 16 + shadcn/ui read-only console (WebSocket stream) |
-| Deployment | planned — tracked in [ROADMAP.md](ROADMAP.md) |
+| Deployment | [`docs/deployment.md`](docs/deployment.md) |
 
 ## Security
 
