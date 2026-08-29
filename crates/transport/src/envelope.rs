@@ -69,4 +69,30 @@ mod test {
         assert_eq!(envelope.device_id, event.device_id);
         assert!(envelope.payload.is_some());
     }
+
+    #[test]
+    fn with_payload_json_value_preserved_through_serde() {
+        let event = sample_event(EventType::TelemetryReceived);
+        let payload =
+            serde_json::json!({"metrics": [{"key": "temp", "value": 25.5, "unit": "celsius"}]});
+        let envelope = EventEnvelope::from(event.clone()).with_payload(payload.clone());
+        let json = serde_json::to_string(&envelope).unwrap();
+        let back: EventEnvelope = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.payload.unwrap(), payload);
+        assert_eq!(back.event_id, event.id);
+        assert_eq!(back.device_id, event.device_id);
+        assert_eq!(back.created_at, event.created_at);
+    }
+
+    #[test]
+    fn envelope_from_invalid_json_returns_error() {
+        let bad_uuid = r#"{"event_id":"not-a-uuid","event_type":"TELEMETRY_RECEIVED","device_id":"00000000-0000-0000-0000-000000000001","created_at":"2026-01-01T00:00:00Z","payload":null}"#;
+        assert!(serde_json::from_str::<EventEnvelope>(bad_uuid).is_err());
+
+        let missing_field = r#"{"event_id":"00000000-0000-0000-0000-000000000001","event_type":"TELEMETRY_RECEIVED","device_id":"00000000-0000-0000-0000-000000000002"}"#;
+        assert!(serde_json::from_str::<EventEnvelope>(missing_field).is_err());
+
+        let unknown_variant = r#"{"event_id":"00000000-0000-0000-0000-000000000001","event_type":"UNKNOWN","device_id":"00000000-0000-0000-0000-000000000002","created_at":"2026-01-01T00:00:00Z","payload":null}"#;
+        assert!(serde_json::from_str::<EventEnvelope>(unknown_variant).is_err());
+    }
 }
