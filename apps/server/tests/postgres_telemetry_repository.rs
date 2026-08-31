@@ -463,3 +463,297 @@ async fn find_by_device_should_respect_limit() {
 
     assert_eq!(samples.len(), 2)
 }
+
+#[tokio::test]
+async fn find_by_device_should_exclude_other_devices() {
+    let pool = test_pool().await;
+    let device_a_id = Uuid::new_v4();
+    let device_a_code = "TEST-ISO-A";
+    let device_b_id = Uuid::new_v4();
+    let device_b_code = "TEST-ISO-B";
+
+    for code in [&device_a_code, &device_b_code] {
+        sqlx::query(
+            "DELETE FROM telemetry WHERE device_id IN (SELECT id FROM devices WHERE code = $1)",
+        )
+        .bind(*code)
+        .execute(&pool)
+        .await
+        .expect("Failed to clean telemetry");
+        sqlx::query("DELETE FROM devices WHERE code = $1")
+            .bind(*code)
+            .execute(&pool)
+            .await
+            .expect("Failed to clean device");
+    }
+
+    for (id, code) in [(device_a_id, device_a_code), (device_b_id, device_b_code)] {
+        sqlx::query("INSERT INTO devices (id, code, name, status) VALUES ($1, $2, $3, $4)")
+            .bind(id)
+            .bind(code)
+            .bind("Isolation Device")
+            .bind("ONLINE")
+            .execute(&pool)
+            .await
+            .expect("Failed to create device");
+    }
+
+    let recorded_at = Utc::now();
+    let repo = PostgresTelemetryRepository::new(pool.clone());
+
+    let telemetry_a = Telemetry {
+        id: Uuid::new_v4(),
+        device_id: device_a_id,
+        metrics: vec![Metric {
+            key: "temp".to_string(),
+            value: 1.0,
+            unit: "c".to_string(),
+        }],
+        recorded_at,
+    };
+    let telemetry_b = Telemetry {
+        id: Uuid::new_v4(),
+        device_id: device_b_id,
+        metrics: vec![Metric {
+            key: "temp".to_string(),
+            value: 2.0,
+            unit: "c".to_string(),
+        }],
+        recorded_at,
+    };
+
+    repo.save(&telemetry_a).await.expect("Failed to save A");
+    repo.save(&telemetry_b).await.expect("Failed to save B");
+
+    let samples_a = repo
+        .find_by_device(device_a_id, 100)
+        .await
+        .expect("Failed to find A");
+    assert_eq!(samples_a.len(), 1);
+    assert_eq!(samples_a[0].value, 1.0);
+
+    let samples_b = repo
+        .find_by_device(device_b_id, 100)
+        .await
+        .expect("Failed to find B");
+    assert_eq!(samples_b.len(), 1);
+    assert_eq!(samples_b[0].value, 2.0);
+}
+
+#[tokio::test]
+async fn find_by_device_should_return_in_desc_order() {
+    let pool = test_pool().await;
+    let device_id = Uuid::new_v4();
+    let device_code = "TEST-ORDER-001";
+
+    sqlx::query(
+        "DELETE FROM telemetry WHERE device_id IN (SELECT id FROM devices WHERE code = $1)",
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean telemetry");
+    sqlx::query("DELETE FROM devices WHERE code = $1")
+        .bind(device_code)
+        .execute(&pool)
+        .await
+        .expect("Failed to clean device");
+
+    sqlx::query("INSERT INTO devices (id, code, name, status) VALUES ($1, $2, $3, $4)")
+        .bind(device_id)
+        .bind(device_code)
+        .bind("Order Device")
+        .bind("ONLINE")
+        .execute(&pool)
+        .await
+        .expect("Failed to create device");
+
+    let now = Utc::now();
+    let earlier = now - chrono::Duration::seconds(10);
+    let repo = PostgresTelemetryRepository::new(pool.clone());
+
+    let telemetry_old = Telemetry {
+        id: Uuid::new_v4(),
+        device_id,
+        metrics: vec![Metric {
+            key: "temp".to_string(),
+            value: 10.0,
+            unit: "c".to_string(),
+        }],
+        recorded_at: earlier,
+    };
+    let telemetry_new = Telemetry {
+        id: Uuid::new_v4(),
+        device_id,
+        metrics: vec![Metric {
+            key: "temp".to_string(),
+            value: 20.0,
+            unit: "c".to_string(),
+        }],
+        recorded_at: now,
+    };
+
+    repo.save(&telemetry_old).await.expect("Failed to save old");
+    repo.save(&telemetry_new).await.expect("Failed to save new");
+
+    let samples = repo
+        .find_by_device(device_id, 100)
+        .await
+        .expect("Failed to find");
+    assert_eq!(samples.len(), 2);
+    assert_eq!(samples[0].value, 20.0);
+    assert_eq!(samples[1].value, 10.0);
+}
+
+#[tokio::test]
+async fn find_by_device_should_return_empty_when_limit_zero() {
+    let pool = test_pool().await;
+    let device_id = Uuid::new_v4();
+    let device_code = "TEST-LIMIT-ZERO";
+
+    sqlx::query(
+        "DELETE FROM telemetry WHERE device_id IN (SELECT id FROM devices WHERE code = $1)",
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean telemetry");
+    sqlx::query("DELETE FROM devices WHERE code = $1")
+        .bind(device_code)
+        .execute(&pool)
+        .await
+        .expect("Failed to clean device");
+
+    sqlx::query("INSERT INTO devices (id, code, name, status) VALUES ($1, $2, $3, $4)")
+        .bind(device_id)
+        .bind(device_code)
+        .bind("Limit Zero Device")
+        .bind("ONLINE")
+        .execute(&pool)
+        .await
+        .expect("Failed to create device");
+
+    let repo = PostgresTelemetryRepository::new(pool.clone());
+    let telemetry = Telemetry {
+        id: Uuid::new_v4(),
+        device_id,
+        metrics: vec![Metric {
+            key: "temp".to_string(),
+            value: 25.0,
+            unit: "c".to_string(),
+        }],
+        recorded_at: Utc::now(),
+    };
+    repo.save(&telemetry).await.expect("Failed to save");
+
+    let samples = repo
+        .find_by_device(device_id, 0)
+        .await
+        .expect("Failed to find");
+    assert!(samples.is_empty());
+}
+
+#[tokio::test]
+async fn find_by_device_should_error_when_limit_negative() {
+    let pool = test_pool().await;
+    let device_id = Uuid::new_v4();
+    let device_code = "TEST-LIMIT-NEG";
+
+    sqlx::query(
+        "DELETE FROM telemetry WHERE device_id IN (SELECT id FROM devices WHERE code = $1)",
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean telemetry");
+    sqlx::query("DELETE FROM devices WHERE code = $1")
+        .bind(device_code)
+        .execute(&pool)
+        .await
+        .expect("Failed to clean device");
+
+    sqlx::query("INSERT INTO devices (id, code, name, status) VALUES ($1, $2, $3, $4)")
+        .bind(device_id)
+        .bind(device_code)
+        .bind("Limit Neg Device")
+        .bind("ONLINE")
+        .execute(&pool)
+        .await
+        .expect("Failed to create device");
+
+    let repo = PostgresTelemetryRepository::new(pool.clone());
+    let telemetry = Telemetry {
+        id: Uuid::new_v4(),
+        device_id,
+        metrics: vec![Metric {
+            key: "temp".to_string(),
+            value: 1.0,
+            unit: "c".to_string(),
+        }],
+        recorded_at: Utc::now(),
+    };
+    repo.save(&telemetry).await.expect("Failed to save");
+
+    let result = repo.find_by_device(device_id, -1).await;
+    assert!(result.is_err());
+}
+
+#[tokio::test]
+async fn find_by_device_should_cap_at_high_limit() {
+    let pool = test_pool().await;
+    let device_id = Uuid::new_v4();
+    let device_code = "TEST-LIMIT-CAP";
+
+    sqlx::query(
+        "DELETE FROM telemetry WHERE device_id IN (SELECT id FROM devices WHERE code = $1)",
+    )
+    .bind(device_code)
+    .execute(&pool)
+    .await
+    .expect("Failed to clean telemetry");
+    sqlx::query("DELETE FROM devices WHERE code = $1")
+        .bind(device_code)
+        .execute(&pool)
+        .await
+        .expect("Failed to clean device");
+
+    sqlx::query("INSERT INTO devices (id, code, name, status) VALUES ($1, $2, $3, $4)")
+        .bind(device_id)
+        .bind(device_code)
+        .bind("Limit Cap Device")
+        .bind("ONLINE")
+        .execute(&pool)
+        .await
+        .expect("Failed to create device");
+
+    let repo = PostgresTelemetryRepository::new(pool.clone());
+    let telemetry = Telemetry {
+        id: Uuid::new_v4(),
+        device_id,
+        metrics: vec![
+            Metric {
+                key: "temp".to_string(),
+                value: 1.0,
+                unit: "c".to_string(),
+            },
+            Metric {
+                key: "humid".to_string(),
+                value: 2.0,
+                unit: "%".to_string(),
+            },
+            Metric {
+                key: "batt".to_string(),
+                value: 3.0,
+                unit: "%".to_string(),
+            },
+        ],
+        recorded_at: Utc::now(),
+    };
+    repo.save(&telemetry).await.expect("Failed to save");
+
+    let samples = repo
+        .find_by_device(device_id, 1000)
+        .await
+        .expect("Failed to find");
+    assert_eq!(samples.len(), 3);
+}
