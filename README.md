@@ -7,7 +7,7 @@
 [![CI](https://github.com/Adibayuluthfiansyah/telemetry-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/Adibayuluthfiansyah/telemetry-hub/actions/workflows/ci.yml)
 
 A device-agnostic telemetry platform in Rust. The backend is developed against a
-virtual device simulator first, so hardware — an ESP32, an Arduino, anything —
+virtual device simulator first, so hardware — an ESP32, an Arduino, anything -
 is never a prerequisite for building, testing, or extending the platform.
 
 - 🔌 **Hardware-free development** — the simulator is a first-class device, so no hardware is ever required to build or extend the platform
