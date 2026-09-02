@@ -76,3 +76,27 @@ async fn get_by_code_should_return_not_found() {
     let error = result.unwrap_err().to_string();
     assert!(error.contains("not found"));
 }
+
+#[tokio::test]
+async fn create_device_should_bubble_db_error() {
+    let repository = MockDeviceRepository::failing();
+    let service = DeviceService::new(repository);
+    let result = service
+        .create_device(
+            "SIM-TEST-001".to_string(),
+            "Simulator Test".to_string(),
+            DeviceType::Simulator,
+        )
+        .await;
+    assert!(result.is_err());
+    assert!(result.unwrap_err().to_string().contains("DB error"));
+}
+
+#[tokio::test]
+async fn get_by_code_should_bubble_db_error() {
+    let repository = MockDeviceRepository::failing();
+    let service = DeviceService::new(repository);
+    let result = service.get_by_code("ANY-CODE").await;
+    assert!(result.is_err());
+    assert!(result.unwrap_err().to_string().contains("DB error"));
+}
