@@ -820,3 +820,83 @@ async fn get_telemetry_should_clamp_limit_to_1000() {
 
     assert_eq!(samples.len(), 1000);
 }
+
+#[tokio::test]
+async fn create_telemetry_should_return_400_when_metric_key_missing() {
+    let pool = test_pool().await;
+    let device_service = DeviceService::new(PostgresDeviceRepository::new(pool.clone()));
+    let telemetry_service = TelemetryService::new(
+        PostgresDeviceRepository::new(pool.clone()),
+        PostgresTelemetryRepository::new(pool.clone()),
+    );
+    let state = AppState {
+        db: pool.clone(),
+        device_service: Arc::new(device_service),
+        telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
+    };
+    let app = create_app(state);
+    let payload = json!({
+        "device_code": "ANY-DEVICE",
+        "metrics": [{"value": 25.5, "unit": "celsius"}]
+    });
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/telemetry")
+                .header("content-type", "application/json")
+                .body(Body::from(payload.to_string()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    let body = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .expect("failed to read response body");
+    let response_json: serde_json::Value =
+        serde_json::from_slice(&body).expect("failed to parse response JSON");
+    assert_eq!(response_json["success"], false);
+}
+
+#[tokio::test]
+async fn create_telemetry_should_return_400_when_metric_value_is_string() {
+    let pool = test_pool().await;
+    let device_service = DeviceService::new(PostgresDeviceRepository::new(pool.clone()));
+    let telemetry_service = TelemetryService::new(
+        PostgresDeviceRepository::new(pool.clone()),
+        PostgresTelemetryRepository::new(pool.clone()),
+    );
+    let state = AppState {
+        db: pool.clone(),
+        device_service: Arc::new(device_service),
+        telemetry_service: Arc::new(telemetry_service),
+        event_publisher: Arc::new(NoopEventPublisher),
+        event_tx: broadcast::channel(256).0,
+    };
+    let app = create_app(state);
+    let payload = json!({
+        "device_code": "ANY-DEVICE",
+        "metrics": [{"key": "temperature", "value": "not-a-number", "unit": "celsius"}]
+    });
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/telemetry")
+                .header("content-type", "application/json")
+                .body(Body::from(payload.to_string()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    let body = axum::body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .expect("failed to read response body");
+    let response_json: serde_json::Value =
+        serde_json::from_slice(&body).expect("failed to parse response JSON");
+    assert_eq!(response_json["success"], false);
+}
