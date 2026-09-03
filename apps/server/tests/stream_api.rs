@@ -191,3 +191,19 @@ async fn stream_filters_events_for_other_devices() {
         "expected no events for an unrelated device filter"
     );
 }
+
+#[tokio::test]
+async fn stream_should_reject_invalid_device_id() {
+    let pool = test_pool().await;
+    let (state, _event_tx) = build_state(pool).await;
+    let listener = TcpListener::bind("127.0.0.1:0").await.expect("bind failed");
+    let addr = listener.local_addr().expect("addr failed");
+    tokio::spawn(axum::serve(listener, create_app(state.clone())).into_future());
+    let result =
+        tokio_tungstenite::connect_async(format!("ws://{addr}/api/v1/stream?device_id=not-a-uuid"))
+            .await;
+    assert!(
+        result.is_err(),
+        "expected handshake failure for invalid UUID"
+    );
+}
