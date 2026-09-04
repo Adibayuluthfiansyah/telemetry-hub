@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (nothing yet — next cycle starts here)
+
+## [0.1.0] - 2026-09-03
+
+### Added
+
 - Device registration API: `POST /api/v1/devices` (HTTP 201, 409 on duplicate code).
 - Device lookup API: `GET /api/v1/devices/{code}` (HTTP 200, 404).
 - Telemetry ingestion API: `POST /api/v1/telemetry` (HTTP 201; 404 for unknown
@@ -70,10 +76,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- ROADMAP.md — M3 dashboard milestone marked ✅ (#25, #44); M4 hardening marked ✅ for tests, API docs, CHANGELOG, deployment (release `v0.1.0` next).
+- ROADMAP.md — M3 dashboard milestone marked ✅ (#25, #44); M4 hardening marked ✅ for tests, API docs, CHANGELOG, deployment (#51–#56).
 - README.md — Quick start now mentions the dashboard (`http://localhost:3001`);
   Documentation table adds Dashboard row.
-
-
-No releases yet. This section will collect user-visible changes before the
-first tag (`v0.1.0`).
