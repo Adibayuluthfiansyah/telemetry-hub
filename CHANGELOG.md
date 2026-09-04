@@ -57,10 +57,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard UI polish: sidebar Button height fix (`h-auto`), active variant
   alignment, typography scale made size-agnostic, console outer frame with
   dotted background.
+- CI: frontend job (Node 20, `npm install`, lint, build) in
+  `.github/workflows/ci.yml`.
+- Deployment guide: `docs/deployment.md` (dev-only, ports 5439/3000/3001, env
+  vars, one-command stack).
+- Test hardening M4 — 48 → 92 workspace tests:
+  - T1 domain core: `Display`/`TryFrom`/serde for enums, `Device`/`Alert`/`Event` (#52).
+  - T2 transport & model mapping: `EventEnvelope` payload + error paths, `DeviceRecord`/`TelemetryRecord` (#53).
+  - T3 Postgres repos: `find_by_id`, duplicate `code`, isolation, limits `0`/`-1`/`1000`, ordering (#54).
+  - T4 service: `MockDeviceRepository::failing` + `MockTelemetryRepository` spy `last_limit` (`max(0)` vs `clamp(1,1000)`), limit-clamp and error bubbling (#55).
+  - T5 handler: health `503` when pool closed, bad metric shape (`missing key` / `string value` → 400), stream `?device_id=invalid-uuid` → 400 (#56).
 
 ### Changed
 
-- ROADMAP.md — M3 dashboard milestone marked ✅ (#25, #44).
+- ROADMAP.md — M3 dashboard milestone marked ✅ (#25, #44); M4 hardening marked ✅ for tests, API docs, CHANGELOG, deployment (release `v0.1.0` next).
 - README.md — Quick start now mentions the dashboard (`http://localhost:3001`);
   Documentation table adds Dashboard row.
 
