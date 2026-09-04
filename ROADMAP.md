@@ -77,7 +77,7 @@ Goal: `v0.1.0` is a release people can depend on.
 - ✅ Unit and integration tests (domain, mapping, repositories, handlers) — 48 → 92 workspace tests (#52 #53 #54 #55 #56)
 - ✅ API documentation published (`docs/api.md` + `openapi.yaml`) — #26
 - ✅ CHANGELOG entries for every user-visible change since M0
-- ⏳ First tagged release `v0.1.0` with release notes (next PR)
+- ✅ First tagged release `v0.1.0` (2026-09-03)
 - ✅ Documentation: `docs/deployment.md` (#51)
 
 **Exit criteria:** the release gate in CONTRIBUTING passes without
