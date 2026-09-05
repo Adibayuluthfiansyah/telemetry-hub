@@ -4,12 +4,13 @@ import { useTelemetryStream } from "@/hooks/use-telemetry-stream";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { EventFeed } from "@/components/dashboard/EventFeed";
+import { MetricTrendChart } from "@/components/dashboard/MetricTrendChart";
 import { TelemetryPanel } from "@/components/dashboard/TelemetryPanel";
 import { MetricStat } from "@/hooks/use-telemetry-stream";
 import { ConnectionState } from "@/hooks/use-telemetry-stream";
 
 export default function Page() {
-  const { connection, events, stats, devices } = useTelemetryStream();
+  const { connection, events, stats, devices, series } = useTelemetryStream();
 
   const latestMetrics = Object.entries(stats) as [string, MetricStat][];
   const totalEvents = events.length;
@@ -51,6 +52,10 @@ export default function Page() {
         <KPICard label="ACTIVE DEVICES" value={String(activeDevices).padStart(2, "0")} status={streamStatus.status} />
         <KPICard label="EVENTS RECEIVED" value={`>${String(totalEvents).padStart(6, "0")}`} status="live" />
         <KPICard label="STREAM STATUS" value={streamStatus.label} status={streamStatus.status} />
+      </div>
+
+      <div className="border border-border">
+        <MetricTrendChart series={series} connection={connection} />
       </div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-10 gap-[1px] bg-border border-border min-h-0">

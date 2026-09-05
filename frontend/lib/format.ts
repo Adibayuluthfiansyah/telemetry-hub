@@ -123,6 +123,14 @@ export function formatAbsoluteTime(
   });
 }
 
+/** Format epoch ms (or ISO string) to chart axis style: "00:12:43". */
+export function formatChartTime(t: number | string): string {
+  const date = typeof t === "number" ? new Date(t) : new Date(t);
+  if (isNaN(date.getTime())) return "—";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
 /** Format ISO timestamp to UTC mission-clock style: "00:12:43.102 UTC". */
 export function formatUtcTimestamp(
   isoString: string,
