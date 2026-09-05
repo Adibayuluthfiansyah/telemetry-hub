@@ -27,6 +27,19 @@ function isEventType(value: string): value is EventType {
   );
 }
 
+export interface TelemetrySample {
+  key: string;
+  value: number;
+  unit: string;
+  recorded_at: string;
+}
+
+export interface TelemetryQueryResponse {
+  device_id: string;
+  count: number;
+  samples: TelemetrySample[];
+}
+
 export function parseEvent(value: unknown): EventEnvelope | null {
   if (typeof value !== "object" || value === null) return null;
   const raw = value as Record<string, unknown>;
