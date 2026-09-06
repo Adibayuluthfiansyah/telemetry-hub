@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust: Edition 2024](https://img.shields.io/badge/rust-edition_2024-orange.svg)](Cargo.toml)
-[![Status: Pre-release](https://img.shields.io/badge/status-pre--release-yellow.svg)](ROADMAP.md)
+[![Status: v0.1.0](https://img.shields.io/badge/status-v0.1.0-blue.svg)](CHANGELOG.md)
 [![Database: PostgreSQL 17](https://img.shields.io/badge/database-postgresql_17-336791.svg)](docker/docker-compose.yml)
 [![CI](https://github.com/Adibayuluthfiansyah/telemetry-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/Adibayuluthfiansyah/telemetry-hub/actions/workflows/ci.yml)
 
@@ -83,7 +83,7 @@ The full identity and decision filter live in
 
 ## Project status
 
-**Pre-release (v0.1.0).** The end-to-end ingestion path works: a device
+**Released (v0.1.0).** The end-to-end ingestion path works: a device
 registers itself, sends telemetry, and the samples can be read back through
 the query API — run the [Quick start](#quick-start) to see it live. Breaking
 changes may still land; the README describes what exists, the

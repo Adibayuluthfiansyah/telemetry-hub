@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (nothing yet — next cycle starts here)
+- Live metric trend charts: full-width `LIVE METRIC TREND` panel (Recharts 3.x,
+  temperature/humidity/battery, ~2 min REST-seeded history + ~1/s live append,
+  bounded 120 pts/key) (#47).
 
 ## [0.1.0] - 2026-09-03
 
